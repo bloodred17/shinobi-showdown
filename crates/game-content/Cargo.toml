@@ -1,0 +1,13 @@
+[package]
+name = "shinobi-game-content"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+shinobi-game-domain = { path = "../game-domain" }
+thiserror.workspace = true
+

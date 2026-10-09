@@ -1,0 +1,36 @@
+{
+  "name": "game-domain",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "crates/game-domain/src",
+  "tags": ["type:domain", "scope:server", "language:rust"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": { "command": "cargo build -p shinobi-game-domain" }
+    },
+    "check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": { "command": "cargo check -p shinobi-game-domain" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": { "command": "cargo test -p shinobi-game-domain" }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "cargo clippy -p shinobi-game-domain --all-targets -- -D warnings"
+      }
+    },
+    "format-check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": { "command": "cargo fmt -p shinobi-game-domain -- --check" }
+    }
+  }
+}

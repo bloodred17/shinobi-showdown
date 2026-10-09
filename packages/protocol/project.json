@@ -1,0 +1,20 @@
+{
+  "name": "protocol",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/protocol/src",
+  "projectType": "library",
+  "implicitDependencies": ["game-protocol"],
+  "tags": ["type:protocol", "scope:shared"],
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --noEmit -p packages/protocol/tsconfig.lib.json",
+          "tsc --noEmit -p packages/protocol/tsconfig.spec.json"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}

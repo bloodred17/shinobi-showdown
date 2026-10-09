@@ -1,0 +1,93 @@
+<main class="shell">
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">M0 stack &amp; contracts spike</p>
+      <h1>Shinobi Tactics</h1>
+      <p class="lede">
+        Angular owns the application shell and transport. Bevy renders logical
+        tiles without receiving authoritative match state.
+      </p>
+    </div>
+
+    <div class="status-cluster" aria-label="Development connection status">
+      <span class="status-label">Local server</span>
+      <strong [attr.data-state]="transport.state()" data-testid="server-state">
+        {{ transport.state() }}
+      </strong>
+      <button type="button" (click)="transport.connect()">Connect</button>
+      <button
+        type="button"
+        class="secondary"
+        [disabled]="transport.state() !== 'connected'"
+        (click)="pingServer()"
+      >
+        Ping
+      </button>
+    </div>
+  </header>
+
+  <section class="battlefield-card" aria-labelledby="battlefield-heading">
+    <div class="card-heading">
+      <div>
+        <p class="eyebrow">Bevy WebAssembly</p>
+        <h2 id="battlefield-heading">Isometric tile-picking spike</h2>
+      </div>
+      <button
+        type="button"
+        [disabled]="battlefield.state() === 'loading'"
+        (click)="battlefield.start()"
+      >
+        Load battlefield
+      </button>
+    </div>
+
+    <div class="canvas-frame">
+      <canvas
+        id="shinobi-game"
+        aria-label="Isometric prototype battlefield"
+      ></canvas>
+      @if (battlefield.state() !== 'ready') {
+      <div class="canvas-placeholder" data-testid="battlefield-state">
+        <span>{{ battlefield.state() }}</span>
+        <p>Load the WASM client to render the cleared placeholder grid.</p>
+      </div>
+      }
+    </div>
+
+    <footer class="telemetry" aria-live="polite">
+      <span>
+        Selected tile:
+        <strong data-testid="selected-tile">
+          @if (selectedTile(); as tile) { ({{ tile.x }}, {{ tile.y }}) } @else {
+          none }
+        </strong>
+      </span>
+      <span>
+        Last server event:
+        <strong data-testid="last-server-event">
+          {{ transport.lastMessage()?.type ?? 'none' }}
+        </strong>
+      </span>
+    </footer>
+  </section>
+
+  <section class="boundary-grid" aria-label="Architecture boundaries">
+    <article>
+      <span>01</span>
+      <h2>Pure rules</h2>
+      <p>Grid and match rules remain headless, deterministic Rust.</p>
+    </article>
+    <article>
+      <span>02</span>
+      <h2>Filtered protocol</h2>
+      <p>Browser messages use dedicated DTOs, never raw match state.</p>
+    </article>
+    <article>
+      <span>03</span>
+      <h2>Single transport</h2>
+      <p>Angular owns the only WebSocket; Bevy emits player intentions.</p>
+    </article>
+  </section>
+</main>
+
+<router-outlet />

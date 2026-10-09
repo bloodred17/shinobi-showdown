@@ -1,0 +1,59 @@
+{
+  "name": "game-protocol",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "crates/game-protocol/src",
+  "tags": ["type:protocol", "scope:shared", "language:rust"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": { "command": "cargo build -p shinobi-game-protocol" }
+    },
+    "check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": { "command": "cargo check -p shinobi-game-protocol" }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": { "command": "cargo test -p shinobi-game-protocol" }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "cargo clippy -p shinobi-game-protocol --all-targets -- -D warnings"
+      }
+    },
+    "format-check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": { "command": "cargo fmt -p shinobi-game-protocol -- --check" }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "outputs": ["{workspaceRoot}/packages/protocol/src/generated"],
+      "options": {
+        "commands": [
+          "cargo run -p shinobi-game-protocol --example export_bindings",
+          "npm exec prettier -- --write packages/protocol/src/generated/bindings.ts"
+        ],
+        "parallel": false
+      }
+    },
+    "check-generated": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "commands": [
+          "npm exec nx run game-protocol:generate",
+          "git diff --exit-code -- packages/protocol/src/generated"
+        ],
+        "parallel": false
+      }
+    }
+  }
+}
