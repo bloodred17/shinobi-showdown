@@ -1,0 +1,66 @@
+{
+  "name": "pi-deepagent-poc",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "tags": ["scope:poc"],
+  "targets": {
+    "setup": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "tools/pi-deepagent-poc",
+        "parallel": false,
+        "commands": [
+          "npm ci --workspaces=false --no-audit --no-fund",
+          "uv sync --locked --python python3.12"
+        ]
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node launch.ts",
+        "cwd": "tools/pi-deepagent-poc",
+        "tty": true
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",
+        "cwd": "tools/pi-deepagent-poc"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "tools/pi-deepagent-poc",
+        "parallel": false,
+        "commands": [
+          "node --test tests/bridge.test.ts",
+          ".venv/bin/python -m unittest discover -s tests -p 'test_*.py' -v",
+          ".venv/bin/python tests/pi_smoke.py"
+        ]
+      }
+    },
+    "smoke-live": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": ".venv/bin/python tests/pi_smoke.py --live",
+        "cwd": "tools/pi-deepagent-poc"
+      }
+    },
+    "format-check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node ../../node_modules/prettier/bin/prettier.cjs --check '*.ts' '*.mjs' '*.json' '*.md' 'tests/*.ts'",
+        "cwd": "tools/pi-deepagent-poc"
+      }
+    }
+  }
+}
