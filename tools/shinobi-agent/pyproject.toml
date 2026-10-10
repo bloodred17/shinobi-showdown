@@ -1,0 +1,13 @@
+[project]
+name = "shinobi-agent"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "deepagents==0.7.23",
+  "langchain-openrouter==0.2.9",
+  "openrouter==0.11.46",
+  "langgraph-checkpoint-sqlite==3.1.1",
+]
+
+[tool.uv]
+package = false

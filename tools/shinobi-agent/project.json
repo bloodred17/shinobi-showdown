@@ -1,0 +1,115 @@
+{
+  "name": "shinobi-agent",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "tags": ["scope:agent"],
+  "targets": {
+    "setup": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "tools/shinobi-agent",
+        "parallel": false,
+        "commands": [
+          "npm ci --workspaces=false --no-audit --no-fund",
+          "uv sync --locked --python python3.12"
+        ]
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node launch.ts",
+        "cwd": "tools/shinobi-agent",
+        "tty": true
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "tools/shinobi-agent",
+        "parallel": false,
+        "commands": [
+          "node --test tests/bridge.test.ts",
+          ".venv/bin/python -m unittest discover -s tests -p 'test_*.py' -v",
+          ".venv/bin/python tests/pi_smoke.py",
+          ".venv/bin/python tests/pi_execution_smoke.py"
+        ]
+      }
+    },
+    "smoke-live": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": ".venv/bin/python tests/pi_smoke.py --live",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
+    "smoke-execution-live": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": ".venv/bin/python tests/pi_execution_smoke.py --live",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
+    "smoke-execution": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": ".venv/bin/python tests/pi_execution_smoke.py",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
+    "evaluate": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": ".venv/bin/python tests/evaluate_local.py",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
+    "evaluate-live": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": ".venv/bin/python tests/evaluate_local.py --live --repeats=1 --workers=1",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
+    "format-check": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": "node ../../node_modules/prettier/bin/prettier.cjs --check '*.ts' '*.mjs' '*.json' '*.md' 'tests/*.ts' 'tests/*.json' '../../docs/agent-development/DEVELOPMENT_SLICES.md'",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "tools/shinobi-agent",
+        "command": "node ../../node_modules/prettier/bin/prettier.cjs --write '*.ts' '*.mjs' '*.json' '*.md' 'tests/*.ts' 'tests/*.json' '../../docs/agent-development/DEVELOPMENT_SLICES.md'"
+      }
+    },
+    "test-python": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "cwd": "tools/shinobi-agent",
+        "command": ".venv/bin/python -m unittest discover -s tests -p 'test_*.py' -v"
+      }
+    }
+  }
+}
