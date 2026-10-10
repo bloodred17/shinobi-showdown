@@ -43,6 +43,9 @@ class Citation(StrictModel):
 
 
 class Proposal(StrictModel):
+    task_type: Literal["unspecified", "investigation", "bug_fix", "feature", "refactor"] = "unspecified"
+    changed_behavior: list[str] = Field(default_factory=list)
+    preserved_behavior: list[str] = Field(default_factory=list)
     objective: str = Field(min_length=1, max_length=4000)
     constraints: list[str]
     exclusions: list[str]

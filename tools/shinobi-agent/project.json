@@ -71,11 +71,27 @@
         "cwd": "tools/shinobi-agent"
       }
     },
+    "evaluate": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": ".venv/bin/python tests/evaluate_local.py",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
+    "evaluate-live": {
+      "executor": "nx:run-commands",
+      "cache": false,
+      "options": {
+        "command": ".venv/bin/python tests/evaluate_local.py --live --repeats=1 --workers=1",
+        "cwd": "tools/shinobi-agent"
+      }
+    },
     "format-check": {
       "executor": "nx:run-commands",
       "cache": false,
       "options": {
-        "command": "node ../../node_modules/prettier/bin/prettier.cjs --check '*.ts' '*.mjs' '*.json' '*.md' 'tests/*.ts'",
+        "command": "node ../../node_modules/prettier/bin/prettier.cjs --check '*.ts' '*.mjs' '*.json' '*.md' 'tests/*.ts' 'tests/*.json' '../../docs/agent-development/DEVELOPMENT_SLICES.md'",
         "cwd": "tools/shinobi-agent"
       }
     },
@@ -84,7 +100,7 @@
       "cache": false,
       "options": {
         "cwd": "tools/shinobi-agent",
-        "command": "node ../../node_modules/prettier/bin/prettier.cjs --write '*.ts' '*.mjs' '*.json' '*.md' 'tests/*.ts'"
+        "command": "node ../../node_modules/prettier/bin/prettier.cjs --write '*.ts' '*.mjs' '*.json' '*.md' 'tests/*.ts' 'tests/*.json' '../../docs/agent-development/DEVELOPMENT_SLICES.md'"
       }
     },
     "test-python": {

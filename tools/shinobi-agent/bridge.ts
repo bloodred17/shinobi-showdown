@@ -37,12 +37,17 @@ export interface ExecutionSettings {
     cwd?: string;
     timeout_seconds?: number;
     affected_items?: string[];
+    protected_paths?: string[];
+    expected_exit_code?: number;
+    baseline_requirement?: 'observe' | 'pass';
   }[];
   work_items: {
     id: string;
     instruction: string;
     paths: string[];
     depends_on?: string[];
+    input_paths?: string[];
+    interfaces?: string[];
   }[];
   limits?: {
     max_workers?: number;
@@ -52,6 +57,10 @@ export interface ExecutionSettings {
     model_calls?: number;
     graph_steps?: number;
   };
+  mode?: 'implement' | 'diagnostic';
+  task_type?: 'investigation' | 'bug_fix' | 'feature' | 'refactor';
+  role_models?: Record<string, string>;
+  guidance_ids?: string[];
 }
 
 export interface Contract {
@@ -63,6 +72,21 @@ export interface Contract {
     model: string;
     policy_version: string;
     proposal: Proposal;
+    schema_version?: number;
+    environment?: {
+      id: string;
+      fingerprint: string;
+      details: Record<string, unknown>;
+    };
+    workflow?: {
+      task_type: string;
+      version: number;
+      fingerprint: string;
+      models: Record<string, string>;
+      definition: Record<string, unknown>;
+      guidance: Record<string, unknown>[];
+    };
+    protected_inputs?: Record<string, [string, boolean]>;
   };
 }
 
@@ -71,8 +95,28 @@ export interface Run {
   status: string;
   contract_hash: string;
   message: string;
+  failure_category?: string | null;
+  usage?: {
+    input_tokens: number | null;
+    output_tokens: number | null;
+    cost: number | null;
+    unreported_calls?: number;
+  };
+  baseline_checks?: { id: string; exit_code: number; outcome: string }[];
+  diagnostic_reports?: {
+    item: string;
+    summary: string;
+    observations: string[];
+    limitations: string[];
+  }[];
   events?: { seq: number; kind: string }[];
-  checks?: { id: string; exit_code: number; artifact_hash: string }[];
+  checks?: {
+    id: string;
+    exit_code: number;
+    artifact_hash: string;
+    outcome?: string;
+    expected_exit_code?: number;
+  }[];
   artifact?: {
     workspace: string;
     branch: string;
@@ -82,10 +126,15 @@ export interface Run {
     patch: string;
     patch_sha256: string;
     evidence?: string;
+    disposition?: string;
   } | null;
 }
 
 export interface Proposal {
+  task_type?:
+    'unspecified' | 'investigation' | 'bug_fix' | 'feature' | 'refactor';
+  changed_behavior?: string[];
+  preserved_behavior?: string[];
   objective: string;
   constraints: string[];
   exclusions: string[];
@@ -193,6 +242,21 @@ function parseResult(stdout: string, request: Request): Result {
       !Array.isArray(c.data.work_items)
     )
       throw new Error('Invalid contract schema.');
+    if (c.data.schema_version !== undefined && c.data.schema_version !== 2)
+      throw new Error('Unsupported execution contract schema version.');
+    if (
+      c.data.schema_version === 2 &&
+      (c.data.policy_version !== 'local-bwrap-v2' ||
+        !c.data.environment ||
+        !/^[a-f0-9]{64}$/.test(c.data.environment.fingerprint) ||
+        !c.data.workflow ||
+        !/^[a-f0-9]{64}$/.test(c.data.workflow.fingerprint) ||
+        !c.data.protected_inputs ||
+        typeof c.data.protected_inputs !== 'object')
+    )
+      throw new Error(
+        'Missing bound environment, workflow or protected check inputs.',
+      );
   }
   if (result.run) {
     const r = result.run;
@@ -209,6 +273,7 @@ function parseResult(stdout: string, request: Request): Result {
         'interrupted',
         'waiting_approval',
         'failed',
+        'blocked',
         'verified',
       ].includes(r.status) ||
       typeof r.message !== 'string' ||

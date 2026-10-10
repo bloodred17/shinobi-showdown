@@ -16,6 +16,7 @@ from openrouter import OpenRouter
 
 from contracts import Outcome
 from repository import ReadOnlyRepository
+from workflows import PLAYBOOKS, validate_model
 
 
 def sanitize(value: str) -> str:
@@ -88,6 +89,7 @@ Only the selected committed snapshot is available; the working tree and uncommit
 No shell, tests, application execution, file edits, skills, delegation, or publishing is available.
 Ask only material unresolved questions. Infer routine technical details by reading the repository.
 Return Outcome using the structured response tool: answer, needs_input, or proposal.
+Emit exactly one final Outcome tool call; never emit several alternatives or combine it with other tools.
 Use empty lists and null where fields are inapplicable. For factual source findings, include evidence
 with repository-relative paths, exact 1-based start/end lines and the claim those lines support.
 You MUST read every cited line with read_file before citing it (search alone is insufficient).
@@ -112,6 +114,17 @@ Use no tools outside those provided. Stay concise and distinguish known behavior
         "dirty_at_creation": metadata["dirty_at_creation"],
         "excluded_count": len(metadata["excluded"]), "excluded_examples": metadata["excluded"][:20],
     })
+    prompt += "\nVersioned task playbooks: " + json.dumps(PLAYBOOKS) + """
+Classify proposals as investigation, bug_fix, feature or refactor. Include task_type,
+changed_behavior and preserved_behavior explicitly. Refactors require named preserved behavior.
+An investigation can end with a grounded answer and uncertainty; do not force a write proposal.
+If diagnosis needs execution, propose mode=diagnostic with no affected/writable paths and read-only
+assignments. Diagnostic findings require a separate approved implementation proposal before writes.
+Existing test and runner inputs are protected by default. New tests may be added within approved
+paths, but protected expectations cannot be edited by workers. Inspect and identify protected_paths
+for each check when the default test/config discovery is insufficient. Work items may declare
+input_paths and shared interfaces; producer/consumer inputs require depends_on edges.
+"""
     return create_deep_agent(
         model=model,
         backend=CompositeBackend(default=StateBackend(), routes={"/repo/": ReadOnlyRepository(workspace, reads)}),
@@ -123,6 +136,7 @@ Use no tools outside those provided. Stay concise and distinguish known behavior
 
 def execution_agent(model_id, tools, schema, prompt, checkpointer=None):
     """Every role has an explicit model, tools, harness, and structured response."""
+    validate_model(model_id)
     register_harness_profile(
         f"openrouter:{model_id}",
         HarnessProfile(general_purpose_subagent=GeneralPurposeSubagentProfile(enabled=False),

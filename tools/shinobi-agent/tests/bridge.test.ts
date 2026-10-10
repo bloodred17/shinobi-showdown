@@ -5,7 +5,7 @@ import type {
   ExtensionAPI,
   ExtensionContext,
 } from '@earendil-works/pi-coding-agent';
-import { runChild, type Request } from '../bridge.ts';
+import { runChild, type Contract, type Request } from '../bridge.ts';
 import extension, { render } from '../extension.ts';
 
 const request: Request = {
@@ -188,4 +188,103 @@ test('draft proposal, citation and snapshot limitation are visible', () => {
   assert.match(text, /retry.py:1-2/);
   assert.match(text, /Working-tree changes are excluded/);
   assert.match(text, /review an executable contract before approval/);
+});
+
+const boundContract: Contract = {
+  hash: 'c'.repeat(64),
+  data: {
+    version: 1,
+    schema_version: 2,
+    proposal_version: 1,
+    source_revision: 'b'.repeat(40),
+    model: 'test/offline',
+    policy_version: 'local-bwrap-v2',
+    mode: 'implement',
+    checks: [
+      {
+        id: 'behavior',
+        argv: ['python3.12', '-m', 'unittest'],
+        protected_paths: ['test_behavior.py'],
+      },
+    ],
+    work_items: [
+      { id: 'cap', instruction: 'Cap retries', paths: ['reconnect.py'] },
+    ],
+    proposal: {
+      objective: 'Cap retries',
+      constraints: [],
+      exclusions: [],
+      approach: ['Change cap'],
+      affected_paths: ['reconnect.py'],
+      acceptance_criteria: ['Cap 10'],
+      unresolved_questions: [],
+      task_type: 'bug_fix',
+    },
+    environment: {
+      id: 'offline-linux-system-v2',
+      fingerprint: 'd'.repeat(64),
+      details: { network: 'none' },
+    },
+    workflow: {
+      task_type: 'bug_fix',
+      version: 1,
+      fingerprint: 'e'.repeat(64),
+      models: { reviewer: 'test/reviewer' },
+      definition: { stages: ['reproduce', 'verify'] },
+      guidance: [{ id: 'independent-assurance', text: 'Challenge evidence' }],
+    },
+    protected_inputs: { 'test_behavior.py': ['f'.repeat(64), false] },
+  },
+};
+
+test('effective authority and protected inputs are visible before hash approval', () => {
+  const text = render({
+    version: 1,
+    status: 'ok',
+    request_id: 'test',
+    session,
+    contract: boundContract,
+  });
+  assert.match(text, /Full effective contract/);
+  assert.match(text, /test_behavior.py/);
+  assert.match(text, /test\/reviewer/);
+  assert.match(text, /Challenge evidence/);
+  assert.match(text, /offline-linux-system-v2/);
+  assert.match(text, /shinobi-approve/);
+});
+
+test('transport rejects unknown or incomplete bound contracts and renders typed blockers', async () => {
+  await assert.rejects(
+    child({
+      ...success,
+      contract: {
+        ...boundContract,
+        data: { ...boundContract.data, schema_version: 99 },
+      },
+    }),
+    /schema version/,
+  );
+  await assert.rejects(
+    child({
+      ...success,
+      contract: {
+        ...boundContract,
+        data: { ...boundContract.data, environment: undefined },
+      },
+    }),
+    /bound environment/,
+  );
+  const result = await child({
+    ...success,
+    run: {
+      id: 'a'.repeat(32),
+      contract_hash: 'c'.repeat(64),
+      status: 'blocked',
+      failure_category: 'environment',
+      message: 'Missing dependency',
+    },
+  });
+  assert.equal(result.run?.status, 'blocked');
+  const text = render({ ...result, outcome: undefined });
+  assert.match(text, /Failure category: environment/);
 });

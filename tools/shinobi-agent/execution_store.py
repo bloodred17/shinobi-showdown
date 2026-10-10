@@ -5,9 +5,9 @@ import json
 import time
 import uuid
 
-from execution_contracts import POLICY_VERSION, TaskContract, digest
+from execution_contracts import BoundaryFailure, POLICY_VERSION, TaskContract, digest
 
-TERMINAL = {"verified", "failed", "cancelled", "waiting_approval"}
+TERMINAL = {"verified", "failed", "blocked", "cancelled", "waiting_approval"}
 
 
 class RunStopped(Exception):
@@ -73,9 +73,14 @@ class Runs:
         row = self.db.execute("SELECT * FROM contracts WHERE hash=?", (identity,)).fetchone()
         if not row:
             raise ValueError("Unknown contract")
-        contract = TaskContract.model_validate_json(row["data"])
-        if digest(contract.model_dump()) != identity or contract.policy_version != POLICY_VERSION:
-            raise ValueError("Contract or policy changed; new approval required")
+        raw = json.loads(row["data"])
+        if digest(raw) != identity:
+            raise BoundaryFailure("evidence", "Contract content changed; new approval required", amendment=True)
+        if raw.get("schema_version") != 2 or raw.get("policy_version") != POLICY_VERSION:
+            raise BoundaryFailure("compatibility", "Legacy or unknown execution contract; records preserved, review a new contract", amendment=True)
+        contract = TaskContract.model_validate(raw)
+        if digest(contract.model_dump()) != identity:
+            raise BoundaryFailure("compatibility", "Contract is not the full canonical schema; review a new contract", amendment=True)
         return contract
 
     def new_run(self, session_id, identity, request_id):
@@ -93,7 +98,9 @@ class Runs:
         run_id = uuid.uuid4().hex
         data = {"repair_cycle": 0, "replans": 0, "model_calls": 0, "completed": [],
                 "attempts": {}, "checks": [], "reviews": [], "artifact": None,
-                "invalidated": False, "message": "Approved and queued", "launch_requested": True}
+                "invalidated": False, "message": "Approved and queued", "launch_requested": True,
+                "baseline_checks": [], "failure_category": None,
+                "usage": {"input_tokens": None, "output_tokens": None, "cost": None}}
         self.db.execute("INSERT INTO approvals VALUES (?,?,?)", (identity, request_id, time.time()))
         self.db.execute("INSERT INTO runs VALUES (?,?,?,?,?,?)",
                         (run_id, session_id, identity, "queued", json.dumps(data), time.time()))
@@ -177,10 +184,10 @@ class Runs:
             if contract.proposal_version != self.store.row(info["session_id"])["proposal_version"]:
                 raise RunStopped("Proposal changed; renewed approval required")
             if time.time() - info["started_at"] > contract.limits.wall_seconds:
-                raise RuntimeError("Approved wall-clock budget exhausted")
+                raise BoundaryFailure("budget", "Approved wall-clock budget exhausted")
             if model_call:
                 if info["model_calls"] >= contract.limits.model_calls:
-                    raise RuntimeError("Approved model-call budget exhausted")
+                    raise BoundaryFailure("budget", "Approved model-call budget exhausted")
                 self.update(run_id, model_calls=info["model_calls"] + 1)
 
     def control(self, run_id, operation, instruction=None):

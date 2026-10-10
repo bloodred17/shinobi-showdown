@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "provenance": "Shinobi repository-owned stdlib acceptance fixtures, MIT",
+  "thresholds": { "minimum_repeats": 3, "minimum_improvement_fraction": 0.1 },
+  "cases": [
+    {
+      "id": "retry-cap",
+      "split": "development",
+      "task_type": "bug_fix",
+      "query": "Propose fixing retry_delay so the delay never exceeds 10. Preserve the function signature and retry_delay(0). Restrict source writes to reconnect.py. Use the existing protected unittest reproduction.",
+      "files": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 30)\n",
+        "test_behavior.py": "import unittest\nfrom reconnect import retry_delay\nclass Behavior(unittest.TestCase):\n    def test_cap(self): self.assertEqual(retry_delay(100), 10)\n    def test_zero(self): self.assertEqual(retry_delay(0), 1)\n"
+      },
+      "targets": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 10)\n"
+      },
+      "items": [
+        {
+          "id": "cap",
+          "instruction": "Cap retry_delay at 10 and preserve its API",
+          "paths": ["reconnect.py"]
+        }
+      ],
+      "judge": "from reconnect import retry_delay; assert [retry_delay(i) for i in range(8)] == [1,2,4,8,10,10,10,10]"
+    },
+    {
+      "id": "new-total",
+      "split": "development",
+      "task_type": "feature",
+      "query": "Propose adding total(values) to reconnect.py. It returns the sum, including zero for an empty iterable, and works with generators. Keep identity(value) unchanged. Use the existing protected unittest checks.",
+      "files": {
+        "reconnect.py": "def identity(value):\n    return value\n",
+        "test_behavior.py": "import unittest\nfrom reconnect import identity, total\nclass Behavior(unittest.TestCase):\n    def test_sum(self): self.assertEqual(total([1, -2, 3]), 2)\n    def test_empty(self): self.assertEqual(total([]), 0)\n    def test_identity(self): self.assertEqual(identity(7), 7)\n"
+      },
+      "targets": {
+        "reconnect.py": "def identity(value):\n    return value\n\ndef total(values):\n    return sum(values)\n"
+      },
+      "items": [
+        {
+          "id": "total",
+          "instruction": "Add total(values) with empty and generator support; preserve identity",
+          "paths": ["reconnect.py"]
+        }
+      ],
+      "judge": "from reconnect import identity, total; assert total(x for x in [2, -4, 8]) == 6; assert total([]) == 0; sentinel=object(); assert identity(sentinel) is sentinel"
+    },
+    {
+      "id": "preserve-total",
+      "split": "held_out",
+      "task_type": "refactor",
+      "query": "Propose refactoring total(values) to use the built-in sum instead of an explicit loop, preserving its signature, empty input, integer and float results, and generator support. Restrict edits to reconnect.py. Require the existing unittest characterization plus an inline AST check that the explicit loop is gone; observe the structural check on the baseline rather than requiring it to pass before changes.",
+      "files": {
+        "reconnect.py": "def total(values):\n    result = 0\n    for value in values:\n        result += value\n    return result\n",
+        "test_behavior.py": "import unittest\nfrom reconnect import total\nclass Behavior(unittest.TestCase):\n    def test_empty(self): self.assertEqual(total([]), 0)\n    def test_ints(self): self.assertEqual(total([1, -2, 3]), 2)\n    def test_float(self): self.assertEqual(total([0.5, 1.5]), 2.0)\n"
+      },
+      "targets": {
+        "reconnect.py": "def total(values):\n    return sum(values)\n"
+      },
+      "items": [
+        {
+          "id": "refactor",
+          "instruction": "Use built-in sum, preserve all characterized behavior",
+          "paths": ["reconnect.py"]
+        }
+      ],
+      "extra_checks": [
+        {
+          "id": "structure",
+          "argv": [
+            "python3.12",
+            "-B",
+            "-c",
+            "import ast; tree=ast.parse(open('reconnect.py').read()); assert not any(isinstance(n, (ast.For,ast.AsyncFor)) for n in ast.walk(tree))"
+          ],
+          "baseline_requirement": "observe"
+        }
+      ],
+      "judge": "from reconnect import total; import ast; assert total(x for x in [2, -4, 8]) == 6; assert total([]) == 0; assert not any(isinstance(n, ast.For) for n in ast.walk(ast.parse(open('reconnect.py').read())))"
+    },
+    {
+      "id": "read-only-diagnosis",
+      "split": "held_out",
+      "task_type": "investigation",
+      "mode": "diagnostic",
+      "query": "Propose an explicitly approved read-only diagnostic investigation: inspect retry_delay, run the existing unittest checks without source writes, report the observed cap and the limits of these checks. No fix is requested.",
+      "files": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 30)\n",
+        "test_behavior.py": "import unittest\nfrom reconnect import retry_delay\nclass Behavior(unittest.TestCase):\n    def test_cap(self): self.assertEqual(retry_delay(100), 30)\n"
+      },
+      "targets": {},
+      "items": [
+        {
+          "id": "inspect",
+          "instruction": "Investigate cap and verification limits without changing source",
+          "paths": [],
+          "input_paths": ["reconnect.py"]
+        }
+      ],
+      "judge": "from reconnect import retry_delay; assert retry_delay(100) == 30"
+    },
+    {
+      "id": "independent-caps",
+      "split": "development",
+      "task_type": "bug_fix",
+      "query": "Propose capping retry_delay at 10 and TIMEOUT at 20, preserving signatures. Write only reconnect.py and limits.py. These assignments are independent. Use the existing protected unittest reproduction.",
+      "files": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 30)\n",
+        "limits.py": "TIMEOUT = 60\n",
+        "test_behavior.py": "import unittest\nfrom reconnect import retry_delay\nfrom limits import TIMEOUT\nclass Behavior(unittest.TestCase):\n    def test_cap(self): self.assertEqual(retry_delay(100), 10)\n    def test_timeout(self): self.assertEqual(TIMEOUT, 20)\n"
+      },
+      "targets": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 10)\n",
+        "limits.py": "TIMEOUT = 20\n"
+      },
+      "items": [
+        {
+          "id": "cap",
+          "instruction": "Cap retry delay at 10",
+          "paths": ["reconnect.py"]
+        },
+        {
+          "id": "timeout",
+          "instruction": "Cap TIMEOUT at 20",
+          "paths": ["limits.py"]
+        }
+      ],
+      "judge": "from reconnect import retry_delay; from limits import TIMEOUT; assert retry_delay(8) == 10; assert retry_delay(0) == 1; assert TIMEOUT == 20"
+    },
+    {
+      "id": "coupled-policy",
+      "split": "held_out",
+      "task_type": "bug_fix",
+      "query": "Propose capping retry_delay at 10 and TIMEOUT at 20, preserving signatures. Write only reconnect.py and limits.py. The timeout assignment depends on the completed cap and declares reconnect.py as an input; both share interface retry-policy. Use the existing protected unittest reproduction.",
+      "files": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 30)\n",
+        "limits.py": "TIMEOUT = 60\n",
+        "test_behavior.py": "import unittest\nfrom reconnect import retry_delay\nfrom limits import TIMEOUT\nclass Behavior(unittest.TestCase):\n    def test_cap(self): self.assertEqual(retry_delay(100), 10)\n    def test_timeout(self): self.assertEqual(TIMEOUT, 20)\n"
+      },
+      "targets": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 10)\n",
+        "limits.py": "TIMEOUT = 20\n"
+      },
+      "items": [
+        {
+          "id": "cap",
+          "instruction": "Cap retry delay at 10",
+          "paths": ["reconnect.py"],
+          "interfaces": ["retry-policy"]
+        },
+        {
+          "id": "timeout",
+          "instruction": "Inspect the completed cap, then set TIMEOUT to 20",
+          "paths": ["limits.py"],
+          "depends_on": ["cap"],
+          "input_paths": ["reconnect.py"],
+          "interfaces": ["retry-policy"]
+        }
+      ],
+      "judge": "from reconnect import retry_delay; from limits import TIMEOUT; assert retry_delay(8) == 10; assert TIMEOUT == 20"
+    }
+  ]
+}

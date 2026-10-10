@@ -1,11 +1,16 @@
 # Shinobi — approved local repository engineering
 
 The Pi extension connects continuing conversations to an independent Python Deep
-Agents/LangGraph backend. Slice 1 investigates committed source and proposes work.
-Slice 2 completes an explicitly approved contract with one implementer, OS
-isolation, durable control, verification, independent review, and bounded repairs.
-Slice 3 adds two-worker scheduling, ownership and dependency validation, serialized
-integration, and selective repairs.
+Agents/LangGraph backend. The local S1–S5 runtime investigates committed source,
+compiles an exact approval contract, executes isolated work, verifies and reviews
+the result, and applies task-specific workflows. These identifiers follow the
+[development roadmap](../../docs/agent-development/DEVELOPMENT_SLICES.md); older
+evidence used coarser local slice numbering.
+
+Supported processes are investigation, bug fix, feature, and refactor. Default
+execution uses one implementer and a fresh read-only reviewer. A contract can
+explicitly select two workers and per-role models. Local deliverables remain
+separate from application to the user's checkout and the planned S6 remote flow.
 
 ## Start
 
@@ -39,6 +44,7 @@ execution settings explicitly, append a JSON object to that command:
 
 ```json
 {
+  "task_type": "bug_fix",
   "checks": [
     {
       "id": "behavior",
@@ -67,17 +73,50 @@ execution settings explicitly, append a JSON object to that command:
 }
 ```
 
-Review the displayed behavior, constraints, exclusions, paths, commands, work
-assignments, limits, model, policy and source commit. Then type
+Review the full effective JSON contract displayed with its summary: behavior,
+constraints, exclusions, paths, commands, work assignments, protected inputs,
+baseline requirements, limits, role models, guidance, policy, environment profile
+and source commit. Then type
 `/shinobi-approve <displayed-contract-hash>`. This exact input is the approval
 operation. The immutable hash binds every contract field. Repeated delivery of
 the same approval cannot create another run. Changed proposals, policies, models,
-or source HEAD require another review and approval.
+or source HEAD require another review and approval. Profile and reviewed-guidance
+drift also invalidate execution at approval, dispatch/recovery, and delivery.
 
 Writable scope uses explicit repository-relative files or directory prefixes
 ending in `/`; no glob patterns, traversal, Git metadata, dependency trees or
 backend state. Work assignments must cover the proposal's affected paths.
-Allow test-file changes explicitly when new tests are part of the requested work.
+Allow new test paths explicitly when new tests are part of the requested work.
+Existing test/configuration inputs discovered in committed source are protected
+by default, including their executable modes. `checks[].protected_paths` can
+explicitly select independent fixtures instead; changing that choice requires a
+new contract. A repository check needs protected inputs; Python `-c` checks bind
+their inline oracle directly in the approved argv. Protection detects changes to
+the selected oracle; it cannot prove every possible assertion is adequate.
+
+Proposals name `changed_behavior` for fixes/features and `preserved_behavior` for
+refactors. Refactors require at least one `baseline_requirement: "pass"` check;
+other checks can explicitly `observe` baseline failures, such as a structural
+objective not yet achieved. Bug-fix reproductions normally observe failure before
+implementation. All final implementation checks must expect exit code zero.
+
+An executable investigation uses `mode: "diagnostic"`, `task_type:
+"investigation"`, empty affected/owned paths, and declared `input_paths`. Its
+worker has read and approved-check tools only. An explicitly expected nonzero
+exit is permitted for diagnostic reproductions. Delivery is marked `diagnostic`
+and includes an empty patch; a fix needs a separate proposal and approval.
+Diagnostic reports require nonempty observations and limitations. Pi displays
+condensed findings after verified delivery; full reports remain in the evidence
+manifest. An empty no-edit disclaimer cannot satisfy the diagnostic schema.
+
+The four versioned playbooks and three original MIT guidance entries are owned
+by this repository in `workflows.py`. Defaults select bounded implementation and
+independent assurance, or source investigation and assurance for diagnostics.
+An explicit `guidance_ids` selection is checked for known provenance, version,
+policy compatibility, role, and capabilities. `role_models` can assign
+`implementer` and `reviewer`; `coordinator` must match the configured conversation
+model. Every selection is included in the contract hash. External skills and Pi
+packages require separate compatibility review and are not automatically imported.
 
 ## Controls and reconnect
 
@@ -127,8 +166,13 @@ unsupported and rejected. Both snapshots have a 100 MiB / 10000-file limit.
 Uncommitted, staged and untracked user changes are excluded and preserved.
 
 Each worker receives its own copy at a recorded integration baseline. Disjoint,
-dependency-ready ownership can run concurrently; overlapping ownership is
-serialized. At most two specialists run at once per state directory, and only one
+dependency-ready ownership can run concurrently. Overlapping ownership, shared
+`interfaces`, or producer/consumer `input_paths` serialize work. A consumer of an
+owned upstream path must declare the producer in its transitive `depends_on`
+graph. Attempts record the consumed input manifest; obsolete or missing input
+identity prevents recovery. These declarations complement combined checks and
+review; they do not discover every semantic coupling automatically.
+At most two specialists run at once per state directory, and only one
 unfinished run per source repository is permitted. Completed worker changes are
 scope-checked and integrated sequentially into immutable candidate repositories.
 A transactional pointer selects the accepted candidate, so an interrupted
@@ -155,16 +199,32 @@ installation or network fallback is supplied. A project requiring absent
 dependencies cannot pass; revise its environment/contract separately.
 Bubblewrap failure blocks execution instead of falling back to host execution.
 
+The versioned profile records tool binary hashes and versions, Linux kernel and
+architecture, backend versions and controller file hashes, dependency metadata
+Git blobs, mounts/network and per-process limits. It measures the installed
+environment; it is not a hermetic image hash of all system libraries. Other
+stacks, dependency bootstrap, and aggregate cgroup quotas remain separate work.
+
 ## Gates, budgets and evidence
 
-Required commands run again on the combined artifact, independently of worker
-claims. Verification records retain argv, cwd, environment, exit status, output,
-elapsed time and artifact hash. A fresh read-only reviewer must cover every
+Required commands run on the unchanged baseline and again on the combined
+artifact, independently of worker claims. Verification records retain phase,
+argv, cwd, environment, protected-input identity, expected/actual exit status,
+output, elapsed time and artifact hash. Empty, skipped, or reduced stdlib unittest
+suites cannot produce verified completion. Missing dependencies/environment and
+evidence failures stop without spending code-repair cycles. Provider, policy,
+code, evidence, compatibility, and budget outcomes remain distinct.
+A fresh read-only reviewer must cover every
 acceptance criterion with approved check IDs and concrete explanations. Failed
 checks, missing coverage, findings or stale evidence prevent a verified result.
+Reviewer context includes the current integrated worker reports and controller
+content identities. Those reports are claims to challenge, including diagnostic
+observations and limits. Parsed review candidates are retained before coverage
+validation, so a rejected recommendation remains inspectable.
 
 Checks and reviewer reports may identify affected work-item IDs for selective
-repair. Their transitive dependents are also rescheduled. Other completed work is
+repair. Their transitive dependents, shared interfaces and input consumers are
+also rescheduled. Other completed work is
 retained. Unlocalized failures conservatively reschedule all approved items.
 Every repair reruns the full combined verification and independent review.
 
@@ -181,6 +241,11 @@ patch and standalone evidence.json. The result records the original source commi
 synthetic local result commit, content hash and patch hash. The user's repository
 is never automatically changed. Verified, user accepted and applied are separate;
 there is no GitHub publication, cloud provisioning, staging, deployment or merge.
+An unchanged implementation requires passing baseline checks and an explicit
+independent `already_satisfied` finding; otherwise it is incomplete. Successful
+deliveries identify `changed`, `already_satisfied`, or `diagnostic` disposition.
+Observed execution token counts are recorded where reported; provider cost
+remains unknown rather than zero.
 
 ## State and recovery
 
@@ -206,6 +271,13 @@ can be integrated after reconciliation. Changed baselines, external workspace
 tampering, unsafe partial files or exhausted limits stop the run. Partial files
 remain available for inspection; state cleanup is not automated.
 
+Execution contracts now use schema 2 and policy `local-bwrap-v2`; JSON transport
+remains version 1. Historical raw contracts and run evidence remain readable.
+Old approvals cannot run under the new policy or acquire added authority through
+defaults. Review a replacement contract and approve its new hash. No historical
+record is silently upgraded or deleted. Recovery also rechecks persisted baseline
+gates and baseline identity before admitting work.
+
 Transport limits remain 120 seconds per adapter request, 64 KiB request/stderr and
 256 KiB response. Sandbox output is capped at 128 KiB. File tools accept UTF-8 files
 up to 1 MiB. Source code is sent to the explicitly configured model for processing.
@@ -217,6 +289,8 @@ npm exec -- nx run shinobi-agent:format
 npm exec -- nx run-many -t test typecheck lint format-check -p shinobi-agent
 npm exec -- nx run shinobi-agent:smoke-live
 npm exec -- nx run shinobi-agent:smoke-execution-live
+npm exec -- nx run shinobi-agent:evaluate
+npm exec -- nx run shinobi-agent:evaluate-live
 ```
 
 The test target includes bridge tests, actual graph/runtime/sandbox tests and
@@ -225,11 +299,36 @@ production has no offline test switch. The live targets need credentials and
 SHINOBI_MODEL. Both paths use a fail-on-call Pi provider plus a negative control
 to establish that handled input bypasses Pi inference.
 
+`evaluate` uses a versioned six-case stdlib corpus, three repeats, and worker
+counts one and two. It exercises the real graphs, sandboxes, protected checks,
+review and independent hidden judge with scripted generation. `evaluate-live`
+uses real provider generation for all four processes, one repeat and one worker;
+this is acceptance evidence, not a repeated performance comparison. For a live
+comparison, pass explicit harness arguments through Nx, for example
+`npm exec -- nx run shinobi-agent:evaluate --args='--live --repeats=3 --workers=1,2'`.
+`--cases=read-only-diagnosis` selects a recorded targeted acceptance rerun. Missing
+corpus cases cannot satisfy the repeated-comparison gate.
+
+Reports bind corpus/configuration hashes and retain correct completions, false
+successes, unauthorized changes, all coordinator/controller calls, repairs,
+latency variability and failed attempts. Execution token usage is separate from
+unmeasured coordinator tokens; total cost and human interventions remain unknown
+when unmeasured. Comparison requires complete repeated coverage, held-out cases,
+no safety failures, quality at least the sequential baseline, and a predeclared
+10% latency or known-cost gain. Scripted results cannot qualify. Eligibility is
+for human review and never changes default routing/parallelism automatically.
+This small corpus is not a broad repository benchmark or statistical guarantee.
+The hidden judges assess fixture behavior, structure and source preservation;
+narrative explanations rely on independent model assurance and are not semantic
+proof. Live incomplete outcomes are retained even when a later acceptance rerun
+passes.
+
 Restricted environments may require NX_DAEMON=false, NX_ISOLATE_PLUGINS=false and
 NX_NATIVE_COMMAND_RUNNER=false, along with PTY/subprocess/namespace access.
 If Nx's native cache crashes during project graph creation, select an isolated
 NX_WORKSPACE_DATA_DIRECTORY under /tmp and rerun the same Nx target.
 See EVIDENCE.md for observed checks and local reports.
+See LOCAL_S5_EVIDENCE.md for the schema-2 increment and its release limitations.
 
 Implementation map: contracts.py and execution_contracts.py define typed authority;
 store.py and execution_store.py own durable state; repository.py and workspace.py

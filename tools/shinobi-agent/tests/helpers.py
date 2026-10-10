@@ -52,7 +52,8 @@ def scripted_generate(self, messages, **kwargs):
             return structured(answer("Draft delay and timeout caps", "proposal",
                 [{"path": "reconnect.py", "start_line": 1, "end_line": 2, "claim": "The delay cap is 30."},
                  {"path": "limits.py", "start_line": 1, "end_line": 1, "claim": "The timeout is 60."}],
-                {"objective": "Cap delay at 10 and timeout at 20", "constraints": ["Preserve public API"],
+                {"task_type": "bug_fix", "changed_behavior": ["Delay caps at 10; timeout is 20"], "preserved_behavior": ["Public API"],
+                 "objective": "Cap delay at 10 and timeout at 20", "constraints": ["Preserve public API"],
                  "exclusions": ["Dependencies and publication"], "approach": ["Change the two constants"],
                  "affected_paths": ["reconnect.py", "limits.py"], "acceptance_criteria": ["Delay caps at 10", "Timeout is 20"],
                  "unresolved_questions": []}))
@@ -60,7 +61,8 @@ def scripted_generate(self, messages, **kwargs):
         return structured(answer(
             "Draft retry cap " + cap, "proposal",
             [{"path": "reconnect.py", "start_line": 1, "end_line": 2, "claim": "The current cap is 30."}],
-            {"objective": "Change retry cap to " + cap, "constraints": ["Preserve API", "Cap " + cap],
+            {"task_type": "bug_fix", "changed_behavior": ["Retry cap " + cap], "preserved_behavior": ["Public API"],
+             "objective": "Change retry cap to " + cap, "constraints": ["Preserve API", "Cap " + cap],
              "exclusions": ["API changes"], "approach": ["Change the cap"], "affected_paths": ["reconnect.py"],
              "acceptance_criteria": ["Delay never exceeds " + cap], "unresolved_questions": []},
         ))

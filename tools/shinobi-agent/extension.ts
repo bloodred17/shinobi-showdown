@@ -36,6 +36,7 @@ export function render(result: Result): string {
       const p = o.proposal;
       lines.push(
         `\nDraft proposal v${result.proposal_version}: ${p.objective}`,
+        `Task type: ${p.task_type || 'unspecified'}`,
       );
       for (const [label, values] of [
         ['Constraints', p.constraints],
@@ -67,6 +68,8 @@ export function render(result: Result): string {
         `Source commit: ${c.data.source_revision}`,
         `Model: ${c.data.model}`,
         `Policy: ${c.data.policy_version}`,
+        `Playbook: ${c.data.workflow?.task_type || 'legacy'} (${c.data.workflow?.fingerprint || 'unbound'})`,
+        `Environment: ${c.data.environment?.id || 'legacy'} (${c.data.environment?.fingerprint || 'unbound'})`,
       );
       for (const [label, values] of [
         ['Constraints', c.data.proposal.constraints],
@@ -87,6 +90,9 @@ export function render(result: Result): string {
             `- ${item.id}: ${item.instruction}; owns ${item.paths.join(', ')}; after ${(item.depends_on || []).join(', ') || 'none'}`,
         ),
         `\nLimits: ${JSON.stringify(c.data.limits)}`,
+        `Protected verification inputs: ${Object.keys(c.data.protected_inputs || {}).join(', ') || 'inline checks or legacy contract'}`,
+        `Role models: ${JSON.stringify(c.data.workflow?.models || { model: c.data.model })}`,
+        `\nFull effective contract:\n${JSON.stringify(c.data, null, 2)}`,
         'Checks run offline with a read-only repository. User changes are excluded.',
         `\nApprove this exact contract: /shinobi-approve ${c.hash}`,
       );
@@ -94,11 +100,27 @@ export function render(result: Result): string {
     if (result.run) {
       const r = result.run;
       lines.push(`\nRun: ${r.id}`, `State: ${r.status}`, r.message);
+      if (r.failure_category)
+        lines.push(`Failure category: ${r.failure_category}`);
+      if (r.baseline_checks?.length)
+        lines.push(
+          ...r.baseline_checks.map(
+            (check) =>
+              `Baseline ${check.id}: ${check.outcome} (exit ${check.exit_code})`,
+          ),
+        );
       if (r.checks?.length)
         lines.push(
           ...r.checks.map(
-            (c) => `Check ${c.id}: exit ${c.exit_code} (${c.artifact_hash})`,
+            (c) =>
+              `Check ${c.id}: ${c.outcome || 'recorded'}; exit ${c.exit_code}, expected ${c.expected_exit_code ?? 0} (${c.artifact_hash})`,
           ),
+        );
+      for (const report of r.diagnostic_reports || [])
+        lines.push(
+          `Diagnostic ${report.item}: ${report.summary}`,
+          ...report.observations.map((value) => `Observation: ${value}`),
+          ...report.limitations.map((value) => `Limit: ${value}`),
         );
       if (r.artifact)
         lines.push(
@@ -107,6 +129,7 @@ export function render(result: Result): string {
           `Workspace: ${r.artifact.workspace}`,
           `Result commit: ${r.artifact.result_revision}`,
           `Artifact: ${r.artifact.artifact_hash}`,
+          `Disposition: ${r.artifact.disposition || 'legacy deliverable'}`,
           'Verified, user accepted, and applied are separate states.',
         );
     } else if ('run' in result) lines.push('No execution run in this session.');
@@ -179,6 +202,7 @@ export default function extension(pi: ExtensionAPI) {
       [
         'verified',
         'failed',
+        'blocked',
         'cancelled',
         'waiting_approval',
         'paused',
@@ -215,6 +239,7 @@ export default function extension(pi: ExtensionAPI) {
             [
               'verified',
               'failed',
+              'blocked',
               'cancelled',
               'waiting_approval',
               'paused',

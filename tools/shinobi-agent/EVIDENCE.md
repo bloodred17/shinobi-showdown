@@ -1,5 +1,9 @@
 # Local slices 1–3 validation — 2026-10-10
 
+This is historical evidence for the coarser local numbering. The approved
+schema-2 S1–S5 increment and subsequent outcomes are recorded separately in
+[LOCAL_S5_EVIDENCE.md](LOCAL_S5_EVIDENCE.md).
+
 Verdict: **implemented and validated on small local acceptance repositories**.
 Both continuing conversations and approved execution passed through the actual
 Pi TUI with real Deep Agents using `deepseek/deepseek-v4.1-flash`.

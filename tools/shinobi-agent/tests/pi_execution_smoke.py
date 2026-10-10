@@ -91,7 +91,7 @@ def main():
         # Pi is absent while the independent controller reaches its terminal artifact.
         deadline = time.monotonic() + (600 if args.live else 40)
         runs = Runs(store)
-        while runs.info(run_id)["status"] not in {"verified", "failed", "waiting_approval", "cancelled"}:
+        while runs.info(run_id)["status"] not in {"verified", "failed", "blocked", "waiting_approval", "cancelled"}:
             if time.monotonic() > deadline:
                 raise AssertionError("Detached execution timed out")
             time.sleep(0.2)
@@ -125,7 +125,7 @@ def main():
             tui.close()
         if run_id:
             runs = Runs(store)
-            if runs.info(run_id)["status"] not in {"verified", "failed", "waiting_approval", "cancelled"}:
+            if runs.info(run_id)["status"] not in {"verified", "failed", "blocked", "waiting_approval", "cancelled"}:
                 with runs.transaction():
                     runs.control(run_id, "cancel")
         store.close()

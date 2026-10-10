@@ -10,6 +10,8 @@ import sys
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langchain_core.messages import ToolMessage
+from langchain.agents.structured_output import StructuredOutputError
+from langgraph.errors import GraphRecursionError
 
 from agent import Evidence, configuration, make_agent, sanitize
 from contracts import Outcome, Request
@@ -141,7 +143,11 @@ def main():
         # Pydantic errors can echo input; expose only a concise summary for validation.
         from pydantic import ValidationError
         detail = "Invalid request or agent response schema" if isinstance(exc, ValidationError) else str(exc)
-        response = {"version": 1, "request_id": request_id, "status": "error", "error": sanitize(detail)[:1000]}
+        from execution_contracts import BoundaryFailure
+        response = {"version": 1, "request_id": request_id, "status": "error", "error": sanitize(detail)[:1000],
+                    "error_category": exc.category if isinstance(exc, BoundaryFailure) else
+                        "evidence" if isinstance(exc, StructuredOutputError) else "budget" if isinstance(exc, GraphRecursionError) else
+                        "validation" if isinstance(exc, (ValidationError, ValueError)) else "runtime"}
     finally:
         signal.alarm(0)
     encoded = json.dumps(response, ensure_ascii=False) + "\n"

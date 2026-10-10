@@ -156,7 +156,8 @@ class ExecutionTests(unittest.TestCase):
         run_id = self.approve()
         with patch("sandbox.shutil.which", return_value=None):
             info = self.execute(run_id)
-        self.assertEqual(info["status"], "failed")
+        self.assertEqual(info["status"], "blocked")
+        self.assertEqual(info["failure_category"], "environment")
         self.assertEqual(info["model_calls"], 0)
         self.assertIsNone(info["artifact"])
 
