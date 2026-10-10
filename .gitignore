@@ -55,3 +55,4 @@ tmp/
 __screenshots__/
 
 vitest.config.*.timestamp*
+graphify-out/
