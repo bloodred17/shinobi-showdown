@@ -45,6 +45,8 @@ Reference versions in that report include Pi 0.84.4, Deep Agents 0.7.23, Python 
 
 The subsequent approved local increment is recorded separately in [LOCAL_S5_EVIDENCE.md](../../tools/shinobi-agent/LOCAL_S5_EVIDENCE.md). It distinguishes current regression results, repeated scripted controller evaluation and live fixture acceptance. These additions retain the supported stdlib/system-tools boundary. S5's broader quality/cost release gate, optional external integrations, and S6 remain open.
 
+For the current local architecture, source-module responsibilities, approval/execution lifecycle, controls, and supported boundaries, read the [implementation guide](../../tools/shinobi-agent/IMPLEMENTATION.md). This roadmap continues to own planned work and unresolved release decisions.
+
 ## Product boundaries and architecture
 
 ### Intended experience
