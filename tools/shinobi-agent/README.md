@@ -12,6 +12,11 @@ execution uses one implementer and a fresh read-only reviewer. A contract can
 explicitly select two workers and per-role models. Local deliverables remain
 separate from application to the user's checkout and the planned S6 remote flow.
 
+For implemented architecture, source-module responsibilities, execution lifecycle,
+recovery, and current limitations, read the [implementation guide](IMPLEMENTATION.md).
+This README provides setup and operating instructions; the guide maps those
+behaviors to the runtime and recorded evidence.
+
 ## Start
 
 Use Linux with Bubblewrap, util-linux `prlimit`, system Python 3.12 and Git.
