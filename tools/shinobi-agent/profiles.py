@@ -44,10 +44,10 @@ def capture_environment(repository, revision, checks):
                            ("deepagents", "langgraph", "langchain-openrouter")},
                "network": "none", "source_mount": "read-only", "temporary_bytes": 67108864,
                "resource_limits": "per-process-prlimit-v1", "source_policy": "committed-only"}
-    details["controller_files"] = {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
+    details["controller_files"] = {name: hashlib.sha256((Path(__file__).parent / name).read_bytes()).hexdigest()
                                    for name in ("agent.py", "contracts.py", "runner.py", "store.py", "execution.py", "execution_api.py", "execution_store.py",
-                                                "execution_contracts.py", "profiles.py", "verification.py", "workflows.py",
-                                                "sandbox.py", "sandbox_fileop.py", "workspace.py", "repository.py")}
+                                                "execution_contracts.py", "engineering.py", "lifecycle.py", "lifecycle_execution.py", "profiles.py", "verification.py", "workflows.py",
+                                                "sandbox.py", "sandbox_fileop.py", "workspace.py", "repository.py", "skills/catalog.json")}
     if details["system"] != "Linux":
         raise BoundaryFailure("environment", "Only the offline Linux profile is supported")
     return EnvironmentProfile(fingerprint=digest(details), details=details)

@@ -37,14 +37,14 @@ const success = {
     proposal: null,
   },
 };
-const child = (value: unknown, code = 0) =>
+const child = (value: unknown, code = 0, input: Request = request) =>
   runChild(
     process.execPath,
     [
       '-e',
       `process.stdin.resume();process.stdin.on('end',()=>{console.log(${JSON.stringify(JSON.stringify(value))});process.exitCode=${code}})`,
     ],
-    request,
+    input,
   );
 
 test('literal query crosses a real process boundary unchanged', async () => {
@@ -54,6 +54,48 @@ test('literal query crosses a real process boundary unchanged', async () => {
     request,
   );
   assert.equal(result.outcome?.message, request.query);
+});
+test('failed planning review remains reviewable without an executable contract', async () => {
+  const planning_review = {
+    stage: 'planning',
+    verdict: 'needs_amendment',
+    summary: 'Missing public behavior evidence',
+    findings: [
+      {
+        category: 'test_design',
+        requirement_ids: ['R1'],
+        explanation: 'The public CLI was never exercised',
+      },
+    ],
+  };
+  const response = {
+    version: 1,
+    status: 'ok',
+    request_id: 'test',
+    session,
+    contract: null,
+    planning_review,
+  };
+  const input: Request = {
+    ...request,
+    operation: 'contract',
+    query: undefined,
+  };
+  const result = await child(response, 0, input);
+  assert.equal(result.contract, null);
+  assert.match(render(result), /The public CLI was never exercised/);
+  assert.match(render(result), /No execution was authorized/);
+  await assert.rejects(
+    child(
+      {
+        ...response,
+        planning_review: { ...planning_review, findings: [null] },
+      },
+      0,
+      input,
+    ),
+    /planning review/,
+  );
 });
 test('rejects mismatched sessions, malformed outcomes, protocol versions and inconsistent exit codes', async () => {
   await assert.rejects(
@@ -287,4 +329,57 @@ test('transport rejects unknown or incomplete bound contracts and renders typed 
   assert.equal(result.run?.status, 'blocked');
   const text = render({ ...result, outcome: undefined });
   assert.match(text, /Failure category: environment/);
+});
+
+test('autonomy is an explicit draft operation with an exact approval instruction', async () => {
+  process.env.SHINOBI_PYTHON = join(process.cwd(), 'tests/fake-child.py');
+  try {
+    const m = mockPi();
+    await m.commands.get('shinobi-new').handler('/fixture', m.ctx);
+    await m.commands.get('shinobi-autonomy').handler('on', m.ctx);
+    let result = m.messages.at(-1);
+    assert.equal(
+      result.details.result.contract.data.autonomy,
+      'within_contract',
+    );
+    assert.equal(result.details.result.run, undefined);
+    assert.match(result.content, /Approve this exact contract/);
+    await m.commands.get('shinobi-autonomy').handler('off', m.ctx);
+    result = m.messages.at(-1);
+    assert.equal(result.details.result.contract.data.autonomy, 'standard');
+    await m.commands.get('shinobi-autonomy').handler('maybe', m.ctx);
+    assert.match(m.messages.at(-1).content, /only drafts a contract/);
+    await m.handlers.get('session_shutdown')!();
+  } finally {
+    delete process.env.SHINOBI_PYTHON;
+  }
+});
+
+test('autonomy offers are advisory and invalid selections are rejected at transport', async () => {
+  const result = await child({
+    ...success,
+    outcome: {
+      ...success.outcome,
+      autonomy_offer: 'Bounded task with clear checks',
+    },
+  });
+  assert.match(render(result), /This offer grants no authority/);
+  assert.match(render(result), /shinobi-autonomy on/);
+  await assert.rejects(
+    child({
+      ...success,
+      contract: {
+        ...boundContract,
+        data: { ...boundContract.data, autonomy: 'unrestricted' },
+      },
+    }),
+    /autonomy selection/,
+  );
+  await assert.rejects(
+    child({
+      ...success,
+      outcome: { ...success.outcome, autonomy_offer: true },
+    }),
+    /autonomy offer/,
+  );
 });

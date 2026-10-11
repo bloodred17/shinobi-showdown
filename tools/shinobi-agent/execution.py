@@ -26,7 +26,9 @@ from store import Store
 from workspace import artifact_hash, commit, copy_workspace, deliver, export, integrate, local_git, manifest, validate_scope
 from profiles import revalidate_environment
 from verification import execute_checks, require_available, validate_protection
-from workflows import conflicting, invalidate_items, revalidate_workflow, role_prompt
+from workflows import autonomy_prompt, conflicting, invalidate_items, revalidate_workflow, role_prompt, skill_tools
+from lifecycle import task_context
+from lifecycle_execution import assess, checkpoint_item, diagnose, enforce_stage, validate_admissions, CorrectionRequired
 
 
 class Context:
@@ -139,12 +141,14 @@ def read_tools(sandbox):
 
 def implement(context, contract, item, key, workspace, feedback):
     sandbox = Sandbox(workspace, context.guard)
-    tools = read_tools(sandbox)
+    tools = read_tools(sandbox) + skill_tools(contract.workflow)
 
     def mutate(operation, path, **args):
         context.guard()
         if path in contract.protected_inputs:
             raise BoundaryFailure("policy", "This path is a protected verification input: " + path, amendment=True)
+        if any(path in a["inputs"] for a in context.info().get("admissions", {}).values()):
+            raise BoundaryFailure("policy", "Admitted tests are immutable during implementation", amendment=True)
         identity = uuid.uuid4().hex
         context.event("file_intent", {"operation_id": identity, "attempt": key, "operation": operation,
                                        "path": path, "input_hash": digest(args)})
@@ -206,8 +210,10 @@ nonempty lists of substantive findings, with source references and actual check 
 requested cap/behavior findings in observations and the concrete coverage gaps in limitations.
 Emit exactly one final DiagnosticReport call, and no WorkerReport call for this diagnostic.
 """
-    prompt += role_prompt(contract.workflow, "implementer") + "\n" + json.dumps({"contract": contract.model_dump(),
-        "assignment": item.model_dump(), "repair_feedback": feedback, "baseline_checks": context.info().get("baseline_checks", [])})
+    prompt += role_prompt(contract.workflow, "implementer") + autonomy_prompt(contract.autonomy) + "\n" + json.dumps({"contract": contract.model_dump(),
+        "assignment": item.model_dump(), "task_context": task_context(contract, item),
+        "diagnosis": context.info().get("diagnosis"), "repair_feedback": feedback,
+        "baseline_checks": context.info().get("baseline_checks", [])})
     with worker_slot(context), SqliteSaver.from_conn_string(str(workspace.parent / "agent.sqlite")) as saver:
         schema = DiagnosticReport if contract.mode == "diagnostic" else WorkerReport
         agent = execution_agent(contract.workflow.models["implementer"], tools, schema, prompt, saver)
@@ -233,7 +239,7 @@ Emit exactly one final DiagnosticReport call, and no WorkerReport call for this 
 
 def assure(context, contract, workspace, checks):
     sandbox = Sandbox(workspace, context.guard)
-    tools = read_tools(sandbox)
+    tools = read_tools(sandbox) + skill_tools(contract.workflow)
     base = local_git(workspace, "rev-list", "--max-parents=0", "HEAD").decode().strip()
     diff = local_git(workspace, "diff", "--no-ext-diff", "--no-textconv", base, "HEAD").decode(errors="replace")
     if len(diff.encode()) > 100000:
@@ -269,6 +275,10 @@ Current integrated worker reports are untrusted claims to assess against source 
 checks. For diagnostics, assess the observations and stated limits in these reports; absence of a
 source patch is expected. Every criterion still needs a coverage entry using an approved check ID,
 with an explanation of the check, source, report or controller evidence that establishes it.
+When engineering.acceptance is present, include all check_ids predeclared for each criterion in
+that criterion's coverage. Challenge the adequacy of the mapped observations and quality constraints;
+green checks alone cannot resolve known limitations. Numeric measurements are controller observations,
+not worker claims. Autonomy never relaxes acceptance criteria or authorizes waiving failed gates.
 """ + role_prompt(contract.workflow, "reviewer") + "\n" + json.dumps({"contract": contract.model_dump(), "diff": diff, "artifact_hash": artifact_hash(workspace),
         "checks": checks, "baseline_checks": current.get("baseline_checks", []),
         "worker_reports": list(integrated.values()),
@@ -302,6 +312,10 @@ with an explanation of the check, source, report or controller evidence that est
             raise BoundaryFailure("evidence", "Assurance pass lacks complete, valid acceptance coverage; missing criteria=" +
                                   str(sorted(expected - set(indices))) + "; invalid check IDs=" + str(invalid_checks) +
                                   "; unresolved findings=" + str(len(report.findings)))
+        if contract.engineering is not None:
+            coverage = {entry.criterion: set(entry.check_ids) for entry in report.coverage}
+            if any(not set(entry.check_ids) <= coverage[entry.criterion] for entry in contract.engineering.acceptance):
+                raise BoundaryFailure("evidence", "Assurance omitted predeclared acceptance checks")
     return {**report.model_dump(), "artifact_hash": artifact_hash(workspace), "tool_calls": evidence.calls,
             "bound_tools": sorted(evidence.bound_tools)}
 
@@ -312,6 +326,13 @@ class GraphState(TypedDict):
 
 def run_graph(context, contract):
     folder = context.root / "runs" / context.run_id
+
+    def ground(_state):
+        context.guard()
+        validate_admissions(context, Path(context.info()["workspace"]))
+        context.event("requirements_loaded", {"requirements_hash": digest(contract.lifecycle.requirements.model_dump()),
+                                               "planning_review": contract.planning_review["input_hash"]})
+        return {"next": "execute"}
 
     def execute_items(_state):
         context.guard()
@@ -328,6 +349,11 @@ def run_graph(context, contract):
             if not batch:
                 raise ValueError("No valid execution schedule")
             baseline = Path(current["workspace"])
+            if contract.task_type == "bug_fix" and any(item.id not in {a.item_id for a in contract.lifecycle.test_admissions} for item in batch):
+                try:
+                    diagnose(context, contract, baseline)
+                except CorrectionRequired as exc:
+                    return repair([exc.report["summary"]], [i.id for i in batch])
             baseline_manifest = manifest(baseline)
             for item in batch:
                 for scope in item.input_paths:
@@ -395,6 +421,10 @@ def run_graph(context, contract):
                 paths = integrate(workspace, candidate, manifest(Path(record["baseline_workspace"])), item.paths)
                 validate_scope(manifest(folder / "baseline"), manifest(candidate), contract.proposal.affected_paths)
                 validate_protection(contract, candidate)
+                try:
+                    admission = checkpoint_item(context, contract, item, candidate, report)
+                except CorrectionRequired as exc:
+                    return repair([exc.report["summary"]], [item.id])
                 revision = commit(candidate, "Approved work item " + item.id)
                 identity = artifact_hash(candidate)
                 context.guard()
@@ -405,6 +435,10 @@ def run_graph(context, contract):
                         raise RunStopped("Control changed during integration")
                     completed = info["completed"] + [item.id]
                     runs.update(context.run_id, workspace=str(candidate), workspace_hash=identity, completed=completed, checks=[], artifact=None)
+                    if admission:
+                        admissions = {**info.get("admissions", {}), item.id: admission}
+                        runs.update(context.run_id, admissions=admissions)
+                        runs.event(context.run_id, "test_admitted", {"item": item.id, **admission})
                     runs.event(context.run_id, "integrated", {"item": item.id, "attempt": key, "paths": paths, "revision": revision, "artifact_hash": identity})
                     attempts = info["attempts"]
                     attempts[key]["status"] = "integrated"
@@ -415,6 +449,9 @@ def run_graph(context, contract):
     def verify(_state):
         context.guard()
         workspace = Path(context.info()["workspace"])
+        validate_admissions(context, workspace)
+        if {a.item_id for a in contract.lifecycle.test_admissions} != set(context.info().get("admissions", {})):
+            raise BoundaryFailure("evidence", "Required test admission is missing")
         checks = execute_checks(context, contract, workspace, "candidate")
         context.update(checks=checks)
         require_available(checks)
@@ -427,10 +464,25 @@ def run_graph(context, contract):
 
     def repair(feedback, affected=None):
         current = context.info()
+        signature = digest(feedback)
+        signatures = current.get("failure_signatures", [])
+        if signature in signatures:
+            context.event("correction", {"route": "diagnose", "reason": "Repeated failure", "feedback": feedback})
+            context.update(diagnosis={})
+        context.update(failure_signatures=[*signatures, signature])
         if current["repair_cycle"] >= contract.limits.repair_cycles:
             context.update(status="failed", failure_category="budget", message="Repair allowance exhausted", feedback=feedback)
             return {"next": "end"}
+        correction = assess(context, contract, Path(current["workspace"]), "correction", {
+            "failure_feedback": feedback, "previous_attempts": current["attempts"], "checks": current["checks"],
+            "instruction": "Classify the failure and explain the next evidence-supported approach. Repeated unsuccessful fixes require reconsidering the cause or plan; do not repeat them blindly."})
+        try:
+            enforce_stage(correction)
+        except CorrectionRequired:
+            pass  # The independent reviewer confirmed a bounded implementation repair.
+        context.event("correction", {"route": "repair", "review": correction, "affected_items": sorted(affected) if affected is not None else None})
         affected = invalidate_items(contract.work_items, affected or [item.id for item in contract.work_items])
+        affected -= set(current.get("admissions", {}))
         retained = [item for item in current["completed"] if item not in affected]
         context.update(repair_cycle=current["repair_cycle"] + 1, completed=retained, checks=[], artifact=None, feedback=feedback)
         context.event("repair", {"cycle": current["repair_cycle"] + 1, "feedback": feedback, "affected_items": sorted(affected), "retained_items": retained})
@@ -450,6 +502,27 @@ def run_graph(context, contract):
             return {"next": "end"}
         if report["verdict"] != "pass":
             return repair(report["findings"] or [report["summary"]], report["affected_items"])
+        return {"next": "validate"}
+
+    def validate(_state):
+        current = context.info()
+        workspace = Path(current["workspace"])
+        independent = [assess(context, contract, workspace, "adversarial", {"checks": current["checks"]}, model=model)
+                       for model in contract.adversarial_models]
+        context.update(adversarial_reviews=independent)
+        for opinion in independent:
+            try:
+                enforce_stage(opinion)
+            except CorrectionRequired as exc:
+                return repair([exc.report["summary"]])
+        report = assess(context, contract, workspace, "validation", {"checks": current["checks"],
+            "quality_review": current["reviews"][-1], "admissions": current.get("admissions", {}),
+            "independent_opinions": independent})
+        try:
+            enforce_stage(report)
+        except CorrectionRequired as exc:
+            return repair([exc.report["summary"]])
+        context.update(validation=report)
         return {"next": "deliver"}
 
     def delivery(_state):
@@ -458,6 +531,10 @@ def run_graph(context, contract):
         workspace = Path(current["workspace"])
         identity = artifact_hash(workspace)
         validate_protection(contract, workspace)
+        validate_admissions(context, workspace)
+        validation = current.get("validation", {})
+        if validation.get("verdict") != "pass" or validation.get("artifact_hash") != identity:
+            raise BoundaryFailure("evidence", "Requirements validation is missing or stale")
         with context.store() as runs:
             revalidate_environment(contract, runs.store.info(current["session_id"])["repository"])
         revalidate_workflow(contract)
@@ -477,6 +554,8 @@ def run_graph(context, contract):
         evidence = {"contract_hash": current["contract_hash"], "contract": contract.model_dump(),
                     "artifact": artifact, "checks": current["checks"], "reviews": current["reviews"],
                     "attempts": current["attempts"], "model_calls": current["model_calls"],
+                    "stage_reviews": current.get("stage_reviews", []), "validation": validation,
+                    "diagnosis": current.get("diagnosis"), "admissions": current.get("admissions", {}),
                     "repair_cycles": current["repair_cycle"], "replans": current["replans"],
                     "schema_version": 2, "baseline_checks": current["baseline_checks"], "usage": current["usage"],
                     "limitations": ["Local Linux prototype; no GitHub or cloud publication", "Only committed source is included",
@@ -495,14 +574,16 @@ def run_graph(context, contract):
         return {"next": "end"}
 
     graph = StateGraph(GraphState)
+    graph.add_node("ground", ground)
     graph.add_node("execute", execute_items)
     graph.add_node("verify", verify)
     graph.add_node("review", review)
+    graph.add_node("validate", validate)
     graph.add_node("deliver", delivery)
-    graph.add_edge(START, "execute")
-    for name in ["execute", "verify", "review", "deliver"]:
+    graph.add_edge(START, "ground")
+    for name in ["ground", "execute", "verify", "review", "validate", "deliver"]:
         graph.add_conditional_edges(name, lambda state: state["next"],
-                                    {"execute": "execute", "verify": "verify", "review": "review", "deliver": "deliver", "end": END})
+                                    {"execute": "execute", "verify": "verify", "review": "review", "validate": "validate", "deliver": "deliver", "end": END})
     with SqliteSaver.from_conn_string(str(folder / "controller.sqlite")) as saver:
         graph.compile(checkpointer=saver).invoke({"next": "execute"},
             config={"configurable": {"thread_id": context.run_id + ":" + uuid.uuid4().hex}, "recursion_limit": 30})

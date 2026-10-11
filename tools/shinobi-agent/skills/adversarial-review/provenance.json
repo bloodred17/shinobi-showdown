@@ -1,0 +1,13 @@
+{
+  "owner": "Shinobi",
+  "license": "MIT",
+  "derived_from": [
+    {
+      "repository": "cursor/plugins",
+      "revision": "978ca6e9c0e012047cd5058b8e829240336e704e",
+      "path": "pstack/skills/interrogate/SKILL.md",
+      "source_sha256": "25341c393f515c1e1fa9bce668b7551e9f98c195113a460ff524d3c1f7f50cd9"
+    }
+  ],
+  "adaptation": "Selected procedures independently maintained by Shinobi. Source identifiers record attribution only; local instructions and resources govern this skill. No upstream fetch, synchronization, package, or runtime dependency."
+}

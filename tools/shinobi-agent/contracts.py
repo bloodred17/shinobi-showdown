@@ -2,6 +2,7 @@
 
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
+from engineering import LifecyclePlan, RequirementRecord
 
 
 class StrictModel(BaseModel):
@@ -19,9 +20,12 @@ class Request(StrictModel):
     contract_hash: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
     run_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{32}$")
     execution: dict | None = None
+    autonomy: Literal["standard", "within_contract"] | None = None
 
     @model_validator(mode="after")
     def required_fields(self):
+        if self.autonomy is not None and (self.operation != "contract" or self.execution is not None):
+            raise ValueError("An autonomy selection only drafts a contract; do not combine it with execution settings")
         if self.operation == "create" and not self.repository:
             raise ValueError("create requires an explicit repository path")
         if self.operation not in {"create", "list"} and not self.session_id:
@@ -42,6 +46,25 @@ class Citation(StrictModel):
     claim: str = Field(min_length=1, max_length=4000)
 
 
+class AcceptanceCheck(StrictModel):
+    criterion: int = Field(ge=0, strict=True)
+    check_ids: list[str] = Field(min_length=1, max_length=20)
+    surface: str = Field(min_length=1, max_length=256)
+    expected_observation: str = Field(min_length=1, max_length=2000)
+    limitations: list[str] = Field(default_factory=list, max_length=20)
+
+
+class QualityConstraint(StrictModel):
+    id: str = Field(pattern=r"^[a-zA-Z0-9_-]{1,64}$")
+    requirement: str = Field(min_length=1, max_length=2000)
+    check_ids: list[str] = Field(min_length=1, max_length=20)
+
+
+class EngineeringPlan(StrictModel):
+    acceptance: list[AcceptanceCheck] = Field(min_length=1, max_length=100)
+    quality_constraints: list[QualityConstraint] = Field(default_factory=list, max_length=20)
+
+
 class Proposal(StrictModel):
     task_type: Literal["unspecified", "investigation", "bug_fix", "feature", "refactor"] = "unspecified"
     changed_behavior: list[str] = Field(default_factory=list)
@@ -55,6 +78,10 @@ class Proposal(StrictModel):
     unresolved_questions: list[str]
     checks: list[dict] = Field(default_factory=list)
     work_items: list[dict] = Field(default_factory=list)
+    engineering: EngineeringPlan | None = None
+    guidance_ids: list[str] | None = Field(default=None, max_length=24)
+    guidance_reason: str = Field(default="", max_length=2000)
+    lifecycle: LifecyclePlan | None = None
 
 
 class Outcome(StrictModel):
@@ -63,6 +90,8 @@ class Outcome(StrictModel):
     questions: list[str]
     evidence: list[Citation]
     proposal: Proposal | None
+    autonomy_offer: str | None = Field(default=None, min_length=1, max_length=2000)
+    requirements: RequirementRecord | None = None
 
     @model_validator(mode="after")
     def consistent_outcome(self):

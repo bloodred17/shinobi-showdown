@@ -1,0 +1,13 @@
+{
+  "owner": "Shinobi",
+  "license": "MIT",
+  "derived_from": [
+    {
+      "repository": "mattpocock/skills",
+      "revision": "49dd158d1076134a641b33efb035946536778336",
+      "path": "skills/engineering/domain-modeling/SKILL.md",
+      "source_sha256": "7b925d7b1e341a2eeae33ad68a8a8c0ab889a38ddd22a7598e4c240e5a7556a3"
+    }
+  ],
+  "adaptation": "Selected procedures independently maintained by Shinobi. Source identifiers record attribution only; local instructions and resources govern this skill. No upstream fetch, synchronization, package, or runtime dependency."
+}

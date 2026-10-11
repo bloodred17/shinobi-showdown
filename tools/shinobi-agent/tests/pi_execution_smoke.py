@@ -64,19 +64,26 @@ def main():
         finally:
             control.close()
         tui = PiTui(folder / "first", fake=not args.live, repository=repository, state=state)
-        query = "Inspect reconnect.py, limits.py, AGENTS.md and test_behavior.py. Produce a proposal to cap retry_delay at 10 and TIMEOUT at 20. Preserve the public API. Writable scope is exactly reconnect.py and limits.py. Exclude dependencies and publication. The existing unittest checks are the acceptance gate. No unresolved product decisions remain."
-        proposal = tui.query(query)["details"]["result"]
-        assert proposal["outcome"]["kind"] == "proposal", proposal
-        session = proposal["session"]["id"]
-        report.update(query=query, proposal=proposal, session_id=session)
-        assert manifest(repository) == before
         settings = {
             "checks": [{"id": "behavior", "argv": ["python3.12", "-B", "-m", "unittest", "test_behavior"], "timeout_seconds": 60}],
             "work_items": [{"id": "cap", "instruction": "Cap retry_delay at 10 without changing the function signature or low-attempt behavior", "paths": ["reconnect.py"]},
                            {"id": "timeout", "instruction": "Set TIMEOUT to 20", "paths": ["limits.py"]}],
             "limits": {"max_workers": 2, "wall_seconds": 900, "model_calls": 60},
         }
-        contract = command(tui, "/shinobi-contract " + json.dumps(settings), lambda r: bool(r.get("contract")))["contract"]
+        query = "Inspect reconnect.py, limits.py, AGENTS.md and test_behavior.py. Produce a proposal to cap retry_delay at 10 and TIMEOUT at 20. Preserve the public API. Writable scope is exactly reconnect.py and limits.py. Exclude dependencies and publication. The existing unittest checks are the acceptance gate. No unresolved product decisions remain."
+        query += " Use these exact check and assignment IDs in the lifecycle proposal (execution still requires exact contract approval): " + json.dumps(settings)
+        proposal = tui.query(query)["details"]["result"]
+        assert proposal["outcome"]["kind"] == "proposal", proposal
+        session = proposal["session"]["id"]
+        report.update(query=query, proposal=proposal, session_id=session)
+        assert manifest(repository) == before
+        if not args.live:
+            from lifecycle_helpers import plan_for
+            origin = store.db.execute("SELECT request_id,query FROM turns WHERE session_id=? ORDER BY rowid DESC LIMIT 1", (session,)).fetchone()
+            settings["lifecycle"] = plan_for(proposal["outcome"]["proposal"], settings, origin["request_id"], origin["query"])
+        planned = command(tui, "/shinobi-contract " + json.dumps(settings), lambda r: bool(r.get("contract") or r.get("planning_review")))
+        assert planned.get("contract"), planned.get("planning_review")
+        contract = planned["contract"]
         report["contract"] = contract
         assert store.db.execute("SELECT count(*) FROM approvals").fetchone()[0] == 0
         assert manifest(repository) == before

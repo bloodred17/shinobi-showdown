@@ -23,4 +23,11 @@ elif r["operation"] == "list":
     result["sessions"] = [session]
 elif r["operation"] == "status":
     result.update(contract=None, run=None)
+elif r["operation"] == "contract":
+    result["contract"] = {"hash": "c" * 64, "data": {
+        "version": 1, "proposal_version": 1, "source_revision": "b" * 40,
+        "model": "test/offline", "policy_version": "transport-fixture",
+        "autonomy": r.get("autonomy", "standard"), "checks": [], "work_items": [],
+        "proposal": {"objective": "Fixture task", "constraints": [], "exclusions": [],
+                     "affected_paths": [], "acceptance_criteria": []}}}
 print(json.dumps(result))

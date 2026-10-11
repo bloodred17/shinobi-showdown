@@ -1,7 +1,10 @@
 {
   "version": 1,
   "provenance": "Shinobi repository-owned stdlib acceptance fixtures, MIT",
-  "thresholds": { "minimum_repeats": 3, "minimum_improvement_fraction": 0.1 },
+  "thresholds": {
+    "minimum_repeats": 3,
+    "minimum_improvement_fraction": 0.1
+  },
   "cases": [
     {
       "id": "retry-cap",
@@ -158,6 +161,28 @@
         }
       ],
       "judge": "from reconnect import retry_delay; from limits import TIMEOUT; assert retry_delay(8) == 10; assert TIMEOUT == 20"
+    },
+    {
+      "id": "cli-surface",
+      "split": "held_out",
+      "task_type": "bug_fix",
+      "query": "The retry CLI must cap high attempts at 10 and preserve delay 1 for attempt zero. Both stdout and the written receipt must reflect the result.",
+      "files": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 30)\n",
+        "cli.py": "import sys\nfrom pathlib import Path\nfrom reconnect import retry_delay\nvalue = retry_delay(int(sys.argv[1]))\nPath(sys.argv[2]).write_text(str(value))\nprint(value)\n",
+        "test_behavior.py": "import subprocess, sys, tempfile, unittest\nfrom pathlib import Path\nclass PublicCli(unittest.TestCase):\n    def test_cli_and_written_receipt(self):\n        with tempfile.TemporaryDirectory() as directory:\n            receipt = str(Path(directory) / \"receipt\")\n            for attempt, expected in [(100, \"10\"), (0, \"1\")]:\n                result = subprocess.run([sys.executable, \"-B\", \"cli.py\", str(attempt), receipt], capture_output=True, text=True)\n                self.assertEqual(result.returncode, 0, result.stderr)\n                self.assertEqual(result.stdout.strip(), expected)\n                self.assertEqual(Path(receipt).read_text(), expected)\n"
+      },
+      "targets": {
+        "reconnect.py": "def retry_delay(attempt):\n    return min(2 ** attempt, 10)\n"
+      },
+      "items": [
+        {
+          "id": "cap",
+          "instruction": "Correct the public CLI cap and receipt while preserving low attempts",
+          "paths": ["reconnect.py"]
+        }
+      ],
+      "judge": "import subprocess,sys,tempfile; from pathlib import Path\nwith tempfile.TemporaryDirectory() as d:\n p=Path(d)/\"receipt\"\n r=subprocess.run([sys.executable,\"-B\",\"cli.py\",\"100\",str(p)],capture_output=True,text=True)\n assert r.returncode==0 and r.stdout.strip()==\"10\" and p.read_text()==\"10\"\n"
     }
   ]
 }

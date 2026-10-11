@@ -65,7 +65,7 @@ class LocalReleaseTests(unittest.TestCase):
         def missing_coverage(self, messages, **kwargs):
             prompt = "\n".join(str(m.content) for m in messages if m.type == "system")
             result = scripted_execution_generate(self, messages, **kwargs)
-            if "independent assurance reviewer" in prompt:
+            if "independent assurance reviewer" in prompt or "independent requirements reviewer" in prompt or "read-only bug diagnostician" in prompt:
                 payload, _ = json.JSONDecoder().raw_decode(prompt[prompt.index('{"contract":'):])
                 handoffs.append(payload)
                 for call in result.generations[0].message.tool_calls:
@@ -222,7 +222,7 @@ class LocalReleaseTests(unittest.TestCase):
             from langchain_core.messages import AIMessage, ToolMessage
             from helpers import output
             prompt = "\n".join(str(m.content) for m in messages if m.type == "system")
-            if "independent assurance reviewer" in prompt:
+            if "independent assurance reviewer" in prompt or "independent requirements reviewer" in prompt or "read-only bug diagnostician" in prompt:
                 return scripted_execution_generate(self, messages, **kwargs)
             if not any(isinstance(m, ToolMessage) for m in messages):
                 return output(AIMessage(content="", tool_calls=[{"name": "read_source", "args": {"path": "reconnect.py"}, "id": "read"}]))

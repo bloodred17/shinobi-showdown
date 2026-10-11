@@ -51,7 +51,25 @@ export function render(result: Result): string {
       lines.push(
         '\nDraft only. Use /shinobi-contract to review an executable contract before approval.',
       );
+      if (p.guidance_ids?.length)
+        lines.push(
+          `Proposed guidance: ${p.guidance_ids.join(', ')}`,
+          p.guidance_reason || '',
+        );
+      if (p.lifecycle)
+        lines.push(
+          `Requirement and scenario plan:\n${JSON.stringify(p.lifecycle, null, 2)}`,
+        );
+      if (p.engineering)
+        lines.push(
+          `Engineering plan:\n${JSON.stringify(p.engineering, null, 2)}`,
+        );
     }
+    if (o.autonomy_offer)
+      lines.push(
+        `\nOptional autonomy: ${o.autonomy_offer}`,
+        'To opt in, use /shinobi-autonomy on, then review and approve its exact contract. This offer grants no authority.',
+      );
     if (o.evidence.length)
       lines.push(
         '\nSource evidence:',
@@ -59,6 +77,16 @@ export function render(result: Result): string {
           (e) => `- ${e.path}:${e.start_line}-${e.end_line}: ${e.claim}`,
         ),
       );
+  } else if (result.planning_review) {
+    lines.push(
+      `Planning review: ${result.planning_review.verdict}`,
+      result.planning_review.summary,
+      ...result.planning_review.findings.map(
+        (f) =>
+          `- ${f.category} (${f.requirement_ids.join(', ')}): ${f.explanation}`,
+      ),
+      'Revise the proposal before drafting a new executable contract. No execution was authorized.',
+    );
   } else if (result.contract || result.run || 'run' in result) {
     if (result.contract) {
       const c = result.contract;
@@ -68,6 +96,7 @@ export function render(result: Result): string {
         `Source commit: ${c.data.source_revision}`,
         `Model: ${c.data.model}`,
         `Policy: ${c.data.policy_version}`,
+        `Autonomy: ${c.data.autonomy === 'within_contract' ? 'opted in within this contract; exact approval still required' : 'standard'}`,
         `Playbook: ${c.data.workflow?.task_type || 'legacy'} (${c.data.workflow?.fingerprint || 'unbound'})`,
         `Environment: ${c.data.environment?.id || 'legacy'} (${c.data.environment?.fingerprint || 'unbound'})`,
       );
@@ -102,6 +131,14 @@ export function render(result: Result): string {
       lines.push(`\nRun: ${r.id}`, `State: ${r.status}`, r.message);
       if (r.failure_category)
         lines.push(`Failure category: ${r.failure_category}`);
+      for (const review of r.stage_reviews || [])
+        lines.push(
+          `${review.stage || 'Lifecycle'} review: ${review.verdict} — ${review.summary}`,
+          ...review.findings.map(
+            (f) =>
+              `- ${f.category} (${f.requirement_ids.join(', ')}): ${f.explanation}`,
+          ),
+        );
       if (r.baseline_checks?.length)
         lines.push(
           ...r.baseline_checks.map(
@@ -111,10 +148,13 @@ export function render(result: Result): string {
         );
       if (r.checks?.length)
         lines.push(
-          ...r.checks.map(
-            (c) =>
-              `Check ${c.id}: ${c.outcome || 'recorded'}; exit ${c.exit_code}, expected ${c.expected_exit_code ?? 0} (${c.artifact_hash})`,
-          ),
+          ...r.checks.flatMap((c) => [
+            `Check ${c.id}: ${c.outcome || 'recorded'}; exit ${c.exit_code}, expected ${c.expected_exit_code ?? 0} (${c.artifact_hash})`,
+            ...(c.measurements || []).map(
+              (m) =>
+                `  ${m.key}: ${m.observed ?? 'missing'} ${m.unit}; ${m.operator} ${m.threshold}: ${m.outcome}`,
+            ),
+          ]),
         );
       for (const report of r.diagnostic_reports || [])
         lines.push(
@@ -363,6 +403,29 @@ export default function extension(pi: ExtensionAPI) {
             'No active session. Use /shinobi-new or /shinobi-resume.',
           );
         await resume(session.id);
+      });
+    },
+  });
+  pi.registerCommand('shinobi-autonomy', {
+    description:
+      'Draft opt-in autonomy on/off; review and approve the resulting exact contract',
+    handler: async (args, ctx) => {
+      await work(ctx, async () => {
+        if (!session)
+          throw new Error(
+            'No active session. Use /shinobi-new or /shinobi-resume.',
+          );
+        const choice = args.trim();
+        if (choice !== 'on' && choice !== 'off')
+          throw new Error(
+            'Use /shinobi-autonomy on or /shinobi-autonomy off. This only drafts a contract.',
+          );
+        const result = await call({
+          operation: 'contract',
+          session_id: session.id,
+          autonomy: choice === 'on' ? 'within_contract' : 'standard',
+        });
+        if (!closed) display(render(result), { result });
       });
     },
   });

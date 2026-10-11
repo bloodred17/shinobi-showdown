@@ -1,0 +1,13 @@
+{
+  "owner": "Shinobi",
+  "license": "MIT",
+  "derived_from": [
+    {
+      "repository": "cursor/plugins",
+      "revision": "978ca6e9c0e012047cd5058b8e829240336e704e",
+      "path": "pstack/skills/principle-never-block-on-the-human/SKILL.md",
+      "source_sha256": "05030a7a083c337676f793881b4e93cd218e8f1dd676529f56e6ac1d3efb8d1f"
+    }
+  ],
+  "adaptation": "Selected procedures independently maintained by Shinobi. Source identifiers record attribution only; local instructions and resources govern this skill. No upstream fetch, synchronization, package, or runtime dependency."
+}

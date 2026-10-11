@@ -1,0 +1,13 @@
+{
+  "owner": "Shinobi",
+  "license": "MIT",
+  "derived_from": [
+    {
+      "repository": "addyosmani/agent-skills",
+      "revision": "1be8e34187e34647bb83adc3a1323b26ae6f6abe",
+      "path": "skills/doubt-driven-development/SKILL.md",
+      "source_sha256": "6fa1fcd8420c28daf7e53c5b08b0f20b907911efd2a6d9bce0b9740da20a4008"
+    }
+  ],
+  "adaptation": "Selected procedures independently maintained by Shinobi. Source identifiers record attribution only; local instructions and resources govern this skill. No upstream fetch, synchronization, package, or runtime dependency."
+}

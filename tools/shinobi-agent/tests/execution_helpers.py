@@ -6,6 +6,10 @@ from helpers import output
 
 
 def scripted_execution_generate(self, messages, **kwargs):
+    from lifecycle_helpers import stage_generate
+    stage = stage_generate(messages)
+    if stage is not None:
+        return stage
     prompt = "\n".join(str(m.content) for m in messages if m.type == "system")
     if "independent assurance reviewer" in prompt:
         if not any(isinstance(m, ToolMessage) and m.name == "read_source" for m in messages):

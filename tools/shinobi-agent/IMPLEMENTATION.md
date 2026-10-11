@@ -1,6 +1,9 @@
 # Shinobi Agent implementation
 
-Implementation snapshot: **2026-10-11**, inspected runtime commit `d4d96ab`.
+Implementation snapshot: **2026-10-11**, including the local engineering-skills
+and opt-in autonomy increment on the `05cedb1` baseline, followed by the requirements-grounded lifecycle implementation and the Shinobi-owned
+skill library. Earlier evidence below
+retains the source identities it actually tested.
 
 Shinobi Agent is a local repository engineering runtime. Pi provides the
 conversation and controls; a Python Deep Agents/LangGraph backend owns proposals,
@@ -26,6 +29,31 @@ not establish working behavior.
 - [Configuration and limits](#configuration-and-limits)
 - [Validation and recorded evidence](#validation-and-recorded-evidence)
 - [Limitations and maintenance](#limitations-and-maintenance)
+
+## Requirements-grounded lifecycle
+
+See [LIFECYCLE.md](LIFECYCLE.md) for the current skill inventory, requirement
+lineage, planning review, test admission and correction workflows. Executable
+contracts now require lifecycle records and independent planning review. The
+execution graph includes grounding and final requirements validation; diagnosis
+and slice reviews occur before implementation/integration. Historical evidence
+below retains the versions it tested.
+
+Core additions are `engineering.py` (strict stage records), `lifecycle.py`
+(traceability and planning/review gates) and `lifecycle_execution.py` (diagnosis,
+independent stage assessment and test admission). Failed planning reviews persist
+in `planning_reviews`; run stage reviews, admissions and validation persist in
+run state and delivered evidence. The controller binds these modules and all
+selected skill resources. Existing approvals lacking the new canonical fields
+require replacement review.
+
+Current validation is recorded in [LIFECYCLE_EVIDENCE.md](LIFECYCLE_EVIDENCE.md):
+84 Python tests, 11 bridge tests, both scripted Pi integration checks and 42/42
+scripted evaluation trials passed. The subsequent
+[live evaluation](LIFECYCLE_LIVE_EVIDENCE.md) completed 0/7 corpus cases before
+execution; the separate live Pi integration check passed. The report identifies
+coordinator validation-feedback and structured-output gaps; the live failures
+remain recorded and no runtime fixes were applied during that evaluation.
 
 ## Implemented scope
 
@@ -54,6 +82,7 @@ flowchart TD
     Pi --> Bridge[Version 1 JSON subprocess bridge]
     Bridge --> API[Python request dispatcher and execution API]
     API --> Coordinator[Read-only conversation coordinator]
+    API --> PlanningReview[Independent requirements and plan review]
     Coordinator --> Snapshot[Committed UTF-8 source snapshot]
     API --> State[SQLite sessions, contracts, approvals, runs, and events]
     API -->|Explicit contract hash approval| Controller[Detached execution controller]
@@ -64,7 +93,8 @@ flowchart TD
     Controller --> Integration[Sequential candidate integration]
     Integration --> Checks[Independent combined verification]
     Checks --> Reviewer[Fresh read-only assurance agent]
-    Reviewer --> Delivery[Local Git result, patch, and evidence]
+    Reviewer --> Validation[Independent requirements validation]
+    Validation --> Delivery[Local Git result, patch, and evidence]
     Coordinator --> Provider[Explicitly configured OpenRouter models]
     Workers --> Provider
     Reviewer --> Provider
@@ -234,6 +264,41 @@ The three built-in MIT guidance entries are `bounded-implementation`,
 provenance/version, policy, role, and capabilities. Guidance cannot add tools or
 authority. External skills and Pi packages are not imported automatically.
 
+The `skills/` directory now contains a Shinobi-owned library registered in
+`skills/catalog.json`: 20 primary procedures, six maintenance procedures,
+14 specialists, one opt-in autonomy procedure and three compatibility guides.
+See [SKILLS.md](SKILLS.md) for the actual local names, routing and procedural
+choices. Selected mechanisms were adapted from the reviewed collections; there
+is no dependency on upstream repositories, packages or update scripts.
+
+The coordinator reads a fixed local catalogue and proposes applicable skills with
+a rationale. Compatible execution roles receive selected instructions, and
+`read_engineering_skill` exposes selected local resources. Source ancestry and MIT
+notices are retained separately from the maintained procedure. Contract hashes
+bind current local bytes; changing those bytes requires fresh approval for an
+existing task, not an upstream hash match. Requirements discovery and maintenance
+are optional; execution defaults are task-sensitive rather than every skill at
+once. Availability does not establish model compliance or missing capabilities.
+
+The original three skills require an explicit `engineering` plan. Its acceptance entries bind
+each criterion to check IDs, an observable surface, expected results and stated
+limitations. Quality requirements reference executable checks. The controller
+rejects incomplete mappings and reviewer coverage that substitutes other checks.
+Optional per-check numeric measurements parse a single JSON object from stdout
+and enforce finite approved thresholds; results record observed values against
+the baseline and candidate identities. Missing/ambiguous evidence blocks delivery.
+This establishes the declared checks and thresholds, not their semantic adequacy.
+
+`autonomy: "within_contract"` is an explicit user selection in the reviewed
+contract. The coordinator can offer it but cannot activate it. The Pi command
+`/shinobi-autonomy on|off` only drafts a new contract; `/shinobi-approve <hash>`
+still authorizes the first execution. Opt-in guidance permits routine decisions
+within approved behavior and scope without repeated consent. Standard execution
+already runs approved work and bounded repairs autonomously. The option changes
+guidance, not sandbox capabilities, budgets, verification gates, or amendment
+requirements. It cannot be toggled during an active run or inherited by a new task.
+Old contracts lacking the new canonical fields require replacement review.
+
 `role_models` can select `implementer` and `reviewer` models explicitly;
 `coordinator` must match the configured conversation model. Unspecified roles use
 that model. Each selection and reviewed guidance fingerprint is contract-bound.
@@ -301,6 +366,7 @@ memory or PID quotas.
 | `/shinobi-resume <session-id>`           | Restore a backend conversation and reconnect to its selected contract/run.              |
 | `/shinobi-session` / `/shinobi-sessions` | Inspect the current session or list the latest 50 sessions.                             |
 | `/shinobi-contract [settings JSON]`      | Compile and display a contract without approving it.                                    |
+| `/shinobi-autonomy on\|off`              | Draft a per-contract autonomy preference; review and approve the new exact hash.        |
 | `/shinobi-approve <hash>`                | Approve the exact latest hash and request detached execution.                           |
 | `/shinobi-status`                        | Observe/reconcile durable state, checks, review, and deliverable without new direction. |
 | `/shinobi-pause`                         | Stop new work and settle active operations before becoming paused.                      |
@@ -398,6 +464,33 @@ file size, and 128 file descriptors. The writable sandbox temporary filesystem i
 
 ## Validation and recorded evidence
 
+The latest [Shinobi-owned skill revision](SKILLS_EVIDENCE.md) passed structural
+validation for all 44 entries, 88 Python tests, 11 bridge tests, both scripted Pi
+integration checks, typecheck, lint and formatting. It verifies local skill
+maintenance, selection and contract/resource binding. No live provider evaluation
+ran for this revision; the earlier live failures below remain unresolved evidence.
+
+The latest lifecycle regression passed 84 Python tests, 11 bridge tests, both
+scripted Pi integration checks and 42/42 scripted evaluation trials. The subsequent
+live evaluation with `deepseek/deepseek-v4.1-flash` completed **0/7 corpus cases**;
+all stopped before contract creation or execution. The separate live Pi integration
+check passed through final requirements validation and reconnection. These results
+demonstrate a working bounded execution path and a remaining coordinator reliability
+gap. See the lifecycle evidence entries below for tested identities and failures.
+
+The earlier 2026-10-11 engineering-skills/autonomy increment passed 73 Python tests,
+10 bridge tests, both scripted Pi conversation/execution flows, TypeScript
+type checking, lint and formatting checks. The three skill files passed the
+skill-creator frontmatter validator. `shinobi-agent:test` exercised the real
+controller, graph, Bubblewrap and Pi with scripted model output; no live-provider
+quality or cost comparison was performed for this increment. The new acceptance
+tests cover plan/checkpoint handoff, skill drift, invalid coverage and numeric
+evidence, threshold failures, advisory offers, and exact-hash autonomy approval.
+The initial outer-sandbox run was blocked by Bubblewrap's NETLINK_ROUTE restriction;
+the successful rerun used the host permissions needed to test Bubblewrap itself.
+An adversarial reviewer fixture was corrected to actually omit its mapped check
+before the final successful run.
+
 Nx exposes setup, serve, test, typecheck, lint, formatting, live smoke, and
 evaluation targets. Setup/commands and an effective settings example are in the
 [README](README.md#start). Useful verification entry points are:
@@ -406,7 +499,7 @@ evaluation targets. Setup/commands and an effective settings example are in the
 # Offline/scripted runtime regression, including both actual Pi flows.
 npm exec -- nx run-many -t test typecheck lint format-check -p shinobi-agent
 
-# Six fixture cases, three repetitions, one and two workers, scripted generation.
+# Seven current fixture cases, three repetitions, one and two workers, scripted generation.
 npm exec -- nx run shinobi-agent:evaluate
 
 # Live provider acceptance; supply SHINOBI_MODEL and OPENROUTER_API_KEY first.
@@ -421,12 +514,14 @@ contracts, graph execution, sandboxing, integration, verification, review gating
 and fixture judges still run. Pi smoke tests include a fail-on-call native provider
 and a negative control to establish the backend inference path.
 
-| Evidence                                                                    | Recorded result                                                                                                             | What it establishes                                                                                      |
-| --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| [EVIDENCE.md](EVIDENCE.md)                                                  | Earlier local acceptance/regression and live Pi results.                                                                    | Historical implementation baseline; its older test counts/slice numbering are retained.                  |
-| [LOCAL_S5_EVIDENCE.md](LOCAL_S5_EVIDENCE.md)                                | 2026-10-10 regression: 60 Python tests, eight bridge tests, both scripted Pi flows, typecheck, lint, and formatting passed. | Recorded supported-profile regression, not tests rerun to write this guide.                              |
-| [Captured JSON](LOCAL_S5_EVIDENCE.json)                                     | Repeated scripted evaluation passed 36/36 trials across six cases, three repeats, and one/two workers.                      | Controller/fixture behavior with no observed false success or unauthorized source/scope change.          |
-| [Live evidence](LOCAL_S5_EVIDENCE.md#live-validation-and-retained-failures) | Full live run reached 5/6, followed by successful targeted diagnostic and detached Pi runs after fixes.                     | Historical live fixture acceptance; not a complete repeated live evaluation of the final implementation. |
+| Evidence                                                                                                  | Recorded result                                                                                                             | What it establishes                                                                                      |
+| --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| [Lifecycle regression](LIFECYCLE_EVIDENCE.md)                                                             | 84 Python tests, 11 bridge tests, both scripted Pi flows and 42/42 scripted trials passed.                                  | Controller behavior on seven fixtures with scripted proposals and reviews.                               |
+| [Lifecycle live evaluation](LIFECYCLE_LIVE_EVIDENCE.md) and [captured JSON](LIFECYCLE_LIVE_EVIDENCE.json) | 0/7 corpus cases completed; separate live Pi integration passed.                                                            | Invalid plans and structured outputs stop before execution; coordinator reliability remains unresolved.  |
+| [EVIDENCE.md](EVIDENCE.md)                                                                                | Earlier local acceptance/regression and live Pi results.                                                                    | Historical implementation baseline; its older test counts/slice numbering are retained.                  |
+| [LOCAL_S5_EVIDENCE.md](LOCAL_S5_EVIDENCE.md)                                                              | 2026-10-10 regression: 60 Python tests, eight bridge tests, both scripted Pi flows, typecheck, lint, and formatting passed. | Recorded supported-profile regression, not tests rerun to write this guide.                              |
+| [Captured JSON](LOCAL_S5_EVIDENCE.json)                                                                   | Repeated scripted evaluation passed 36/36 trials across six cases, three repeats, and one/two workers.                      | Controller/fixture behavior with no observed false success or unauthorized source/scope change.          |
+| [Live evidence](LOCAL_S5_EVIDENCE.md#live-validation-and-retained-failures)                               | Full live run reached 5/6, followed by successful targeted diagnostic and detached Pi runs after fixes.                     | Historical live fixture acceptance; not a complete repeated live evaluation of the final implementation. |
 
 Saved failures, amendments, invalid structured output, and provider HTTP 504s
 remain visible. Later targeted successes do not erase earlier failures or establish
@@ -448,6 +543,22 @@ Scripted results cannot satisfy this gate. The small stdlib corpus does not
 establish broad repository quality or statistical confidence.
 
 ## Limitations and maintenance
+
+The immediate known gap is coordinator correction before contract approval.
+Current provenance validation happens after coordinator invocation, lifecycle
+mapping validation happens during contract compilation, and structured-output
+errors terminate the turn. The live failures include non-verbatim quotes,
+misassigned exclusions, uncovered invariants, token-limit truncation and duplicate
+`Outcome` calls. Rejection prevents invalid work from progressing but does not
+guide the coordinator to a corrected proposal.
+
+The [proposed follow-up](LIFECYCLE_LIVE_EVIDENCE.md#root-cause-findings-and-recommended-next-slice)
+is **not implemented**: read-only draft validation with actionable errors, at most
+two corrections within existing graph/deadline limits, explicit provenance/mapping
+rules, and distinct handling of truncated or duplicate output. Independent planning
+review, exact first-contract approval, budgets and execution scope remain mandatory.
+The failed live cases must be rerun after an approved correction slice; prior
+scripted success cannot substitute for that evidence.
 
 Remaining local work includes repeated final live quality/cost comparisons,
 representative repository evaluation, additional approved stack profiles,

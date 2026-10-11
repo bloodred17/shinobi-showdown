@@ -1,0 +1,1854 @@
+{
+  "corpus_version": 1,
+  "corpus_hash": "c72a8c5f3d1d244ad30b32aa359ca559480a422da7be118ced638bb017b23aaa",
+  "thresholds": {
+    "minimum_repeats": 3,
+    "minimum_improvement_fraction": 0.1
+  },
+  "configurations": {
+    "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129": {
+      "workers": 1,
+      "role_models": {},
+      "model": "test/offline",
+      "policy": "local-bwrap-v2",
+      "workflow_hash": "74b6d8b446aaa2273e121e8c3c5b277751a7ce0989a73d2096f0b9d8104dbfea",
+      "guidance_hash": "c58328868691d5d7b5ca3c113fcc29c03d96f7ba3c400a57e7403db6f47c8b5c",
+      "runtime_files": {
+        "agent.py": "93bcfb81f15e867040a6452cacf202ff7d2ebe675d2b9bb501e20e118aebae54",
+        "runner.py": "67cc67b4ce18f7178686b089f00ffda02170c104640cd99efd1a1186d7a900fe",
+        "execution.py": "ddea15227bf99160ed51d095a569b158dafdf60af5679d32446afe6aebd0c93f",
+        "execution_api.py": "9ff3302e5e48dcda958381d374bee0172e398ca13e348c4c173311c4ca0b8a85",
+        "execution_contracts.py": "a764bcef39e13c8c560f82472f79a29e838b50bb4f2fbc34f8efe7dedb5debcd",
+        "engineering.py": "52dbf1a7c8971b02ec7862bae2ba191572fee8f1f5654e07f456729f6845b015",
+        "lifecycle.py": "51f1fdf5904f77b6fa2dc8644cc3241ee27ad023cc5b319f97375293e74a6949",
+        "lifecycle_execution.py": "5f1eae08f9e09befbb17b4e2ba1aeecf14fb86c66192f41cba58596b8cbbe948",
+        "profiles.py": "50af085d44e7e25c40b61dc9c172fe431320a178f313a54e40bc9415ab1e74c2",
+        "verification.py": "966ecb767ba400433841248c2a975fb91e27029b2d086ea1ab99dc3980aad68d",
+        "workflows.py": "f350d667c9b5729dc5da1d1571c555fbeae16aa1e9894701b6fd8a85d1f1d48a"
+      },
+      "harness_hash": "bbff4b8e39a8e74a4981555d2dd47e9d3f502ec029ef40763f854576a956b55a",
+      "selected_cases": [
+        "retry-cap",
+        "new-total",
+        "preserve-total",
+        "read-only-diagnosis",
+        "independent-caps",
+        "coupled-policy",
+        "cli-surface"
+      ],
+      "id": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129"
+    },
+    "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33": {
+      "workers": 2,
+      "role_models": {},
+      "model": "test/offline",
+      "policy": "local-bwrap-v2",
+      "workflow_hash": "74b6d8b446aaa2273e121e8c3c5b277751a7ce0989a73d2096f0b9d8104dbfea",
+      "guidance_hash": "c58328868691d5d7b5ca3c113fcc29c03d96f7ba3c400a57e7403db6f47c8b5c",
+      "runtime_files": {
+        "agent.py": "93bcfb81f15e867040a6452cacf202ff7d2ebe675d2b9bb501e20e118aebae54",
+        "runner.py": "67cc67b4ce18f7178686b089f00ffda02170c104640cd99efd1a1186d7a900fe",
+        "execution.py": "ddea15227bf99160ed51d095a569b158dafdf60af5679d32446afe6aebd0c93f",
+        "execution_api.py": "9ff3302e5e48dcda958381d374bee0172e398ca13e348c4c173311c4ca0b8a85",
+        "execution_contracts.py": "a764bcef39e13c8c560f82472f79a29e838b50bb4f2fbc34f8efe7dedb5debcd",
+        "engineering.py": "52dbf1a7c8971b02ec7862bae2ba191572fee8f1f5654e07f456729f6845b015",
+        "lifecycle.py": "51f1fdf5904f77b6fa2dc8644cc3241ee27ad023cc5b319f97375293e74a6949",
+        "lifecycle_execution.py": "5f1eae08f9e09befbb17b4e2ba1aeecf14fb86c66192f41cba58596b8cbbe948",
+        "profiles.py": "50af085d44e7e25c40b61dc9c172fe431320a178f313a54e40bc9415ab1e74c2",
+        "verification.py": "966ecb767ba400433841248c2a975fb91e27029b2d086ea1ab99dc3980aad68d",
+        "workflows.py": "f350d667c9b5729dc5da1d1571c555fbeae16aa1e9894701b6fd8a85d1f1d48a"
+      },
+      "harness_hash": "bbff4b8e39a8e74a4981555d2dd47e9d3f502ec029ef40763f854576a956b55a",
+      "selected_cases": [
+        "retry-cap",
+        "new-total",
+        "preserve-total",
+        "read-only-diagnosis",
+        "independent-caps",
+        "coupled-policy",
+        "cli-surface"
+      ],
+      "id": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33"
+    }
+  },
+  "baseline": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+  "summaries": {
+    "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129": {
+      "samples": 21,
+      "correct_completions": 21,
+      "correct_completion_rate": 1.0,
+      "false_successes": 0,
+      "unauthorized_actions": 0,
+      "median_seconds": 1.1683019420015626,
+      "seconds_stdev": 0.3417363974434265,
+      "total_model_calls": 267,
+      "total_repairs": 0,
+      "total_cost": null,
+      "cost_per_correct_completion": null,
+      "human_interventions": null,
+      "failures": [],
+      "cases": {
+        "cli-surface": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.5779764809994958,
+          "seconds_stdev": 0.06343712264842327,
+          "total_model_calls": 36,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "coupled-policy": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.5352529069932643,
+          "seconds_stdev": 0.06698055958813708,
+          "total_model_calls": 54,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "independent-caps": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.6491479499964043,
+          "seconds_stdev": 0.12569608245836114,
+          "total_model_calls": 54,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "new-total": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 0.8628787519992329,
+          "seconds_stdev": 0.06032836081345073,
+          "total_model_calls": 30,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "preserve-total": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.0278617489966564,
+          "seconds_stdev": 0.08543302818987676,
+          "total_model_calls": 30,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "read-only-diagnosis": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 0.7860441490047378,
+          "seconds_stdev": 0.0056770702155695425,
+          "total_model_calls": 27,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "retry-cap": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.1026492079981836,
+          "seconds_stdev": 0.06954733221976518,
+          "total_model_calls": 36,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        }
+      }
+    },
+    "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33": {
+      "samples": 21,
+      "correct_completions": 21,
+      "correct_completion_rate": 1.0,
+      "false_successes": 0,
+      "unauthorized_actions": 0,
+      "median_seconds": 1.1072634059964912,
+      "seconds_stdev": 0.2944448232388023,
+      "total_model_calls": 261,
+      "total_repairs": 0,
+      "total_cost": null,
+      "cost_per_correct_completion": null,
+      "human_interventions": null,
+      "failures": [],
+      "cases": {
+        "cli-surface": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.5578643559856573,
+          "seconds_stdev": 0.006483842150148058,
+          "total_model_calls": 36,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "coupled-policy": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.541795117998845,
+          "seconds_stdev": 0.05657653367435971,
+          "total_model_calls": 54,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "independent-caps": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.1956907689891523,
+          "seconds_stdev": 0.07409606859465484,
+          "total_model_calls": 48,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "new-total": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 0.844341441988945,
+          "seconds_stdev": 0.011670057766791352,
+          "total_model_calls": 30,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "preserve-total": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.0450723630056018,
+          "seconds_stdev": 0.09507769210192867,
+          "total_model_calls": 30,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "read-only-diagnosis": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 0.7830899469990982,
+          "seconds_stdev": 0.021349393428208085,
+          "total_model_calls": 27,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        },
+        "retry-cap": {
+          "samples": 3,
+          "correct_completions": 3,
+          "correct_completion_rate": 1.0,
+          "false_successes": 0,
+          "unauthorized_actions": 0,
+          "median_seconds": 1.0906232109991834,
+          "seconds_stdev": 0.009866588425342096,
+          "total_model_calls": 36,
+          "total_repairs": 0,
+          "total_cost": null,
+          "cost_per_correct_completion": null,
+          "human_interventions": null,
+          "failures": []
+        }
+      }
+    }
+  },
+  "decisions": {
+    "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33": {
+      "eligible_for_review": false,
+      "reasons": [
+        "Scripted generation establishes controller behavior, not model quality or a production improvement",
+        "No predeclared improvement in time or known cost was observed"
+      ],
+      "automatic_adoption": false
+    }
+  },
+  "limitations": [
+    "Small stdlib fixture corpus; not evidence of broad repository quality",
+    "Live trials require separately configured models; unknown cost and human effort remain unknown",
+    "Measured variability is descriptive; no statistical confidence or automatic policy change is asserted"
+  ],
+  "source_baseline": "05cedb15170888e5682b8a00623e4daf09feca07",
+  "generation": "scripted",
+  "seed": 0,
+  "artifact_root": "/tmp/shinobi-workflow-evaluation-clb4l4et",
+  "records": [
+    {
+      "case": "cli-surface",
+      "split": "held_out",
+      "repeat": 0,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.668895116992644,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "834d207aee9164fb4706c5fc6516ab47655f118932b15b492b9c63b3b958936a",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/cli-surface-1-0/state/runs/5cb0fabeeb12469a9fed9d230dbe0b65/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "new-total",
+      "split": "development",
+      "repeat": 2,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.8365570919995662,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "f23acc54a3b78d284857453fd19a376c5655723b39be8fcfa19b4f38a2eab023",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/new-total-2-2/state/runs/fe71f258734c44fa82045c1128cdd44e/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "coupled-policy",
+      "split": "held_out",
+      "repeat": 0,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.541795117998845,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "6662af3fb27f6594b1622a021a64512e114686a4a549965787e2ed3adab01fac",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/coupled-policy-2-0/state/runs/9827f7d910644c089d25b97432832393/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "retry-cap",
+      "split": "development",
+      "repeat": 0,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.0649022900033742,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "7667c5df81146c4832c268f0bfbd2529a623ebb648c698af72f660567461f43a",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/retry-cap-1-0/state/runs/9eb4732223694b019e1b954545fb44b3/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "cli-surface",
+      "split": "held_out",
+      "repeat": 1,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.5467992749909172,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "65cc67637a02add7a1f813e37bca6b8a0a3d9db7321abfdb76e60adf265bea06",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/cli-surface-1-1/state/runs/6fe6b36af7bd4eeeb69619dedb8116ba/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "read-only-diagnosis",
+      "split": "held_out",
+      "repeat": 2,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.7958456630003639,
+      "model_calls": 9,
+      "repair_cycles": 0,
+      "execution_model_calls": 6,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 6
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "e3e84aa0fc705d6117adb37246d9cdbff84fbf5af23785cca939da3969bdbadf",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/read-only-diagnosis-1-2/state/runs/36311e8e61c0462d9e86e9690991a8ba/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "preserve-total",
+      "split": "held_out",
+      "repeat": 2,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.0137976770056412,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "3a451f73e543978c6cb8c63a24f3a8e00ca8083eefc3cc5b107816041410f445",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/preserve-total-1-2/state/runs/e35b7998a50c4651869b0ed70bda0b64/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "new-total",
+      "split": "development",
+      "repeat": 1,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.9599605809926288,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "6a1ff6f440d0ea663ec5f2d88b74598bc6c96b1c33a295f606028369ed520d7d",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/new-total-1-1/state/runs/e6d96a4f91564f2f9b307019c6a8d009/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "read-only-diagnosis",
+      "split": "held_out",
+      "repeat": 0,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.7859815279953182,
+      "model_calls": 9,
+      "repair_cycles": 0,
+      "execution_model_calls": 6,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 6
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "bf717c0f70f1a59b6bb4c10d116457dd6da60ccf0530eec115344790e75e1074",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/read-only-diagnosis-1-0/state/runs/db2e6317b6dc4d0198362ff0453401c7/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "read-only-diagnosis",
+      "split": "held_out",
+      "repeat": 0,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.7755839169985848,
+      "model_calls": 9,
+      "repair_cycles": 0,
+      "execution_model_calls": 6,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 6
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "902497601ca5ab930abbc7d03eadeb41b8d73d42454380d9f6b1791257b5879f",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/read-only-diagnosis-2-0/state/runs/55133c99d42c4ce8aa9002ff563b90fd/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "preserve-total",
+      "split": "held_out",
+      "repeat": 0,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.0278617489966564,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "b7485dc0fd4f01eb1a6ef22563b922f4070153d6246994e5d6edcd8fae56577e",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/preserve-total-1-0/state/runs/dd1e5cffb0bd4efea17ae4bbb29fc838/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "new-total",
+      "split": "development",
+      "repeat": 0,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.8628787519992329,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "b08d252403d3ba9fa6a410402060f1e067eb7565103b04ae0461a9bde66e55bd",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/new-total-1-0/state/runs/f0530e992d1f472691ee3219f338208a/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "retry-cap",
+      "split": "development",
+      "repeat": 2,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.0906232109991834,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "955ebded4593ef565f4d0be9e31dfd26a5b227170a767599acf77049db6aad1f",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/retry-cap-2-2/state/runs/5d3083ae07004ef1bb803c5bc93790a8/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "retry-cap",
+      "split": "development",
+      "repeat": 1,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.1997148359951098,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "0637bb9ae10496081eb32bdfe95a41be7c5542b5f5ccd265819698e876a58558",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/retry-cap-1-1/state/runs/b84101442e404141ad3be4d0ae44a70d/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "read-only-diagnosis",
+      "split": "held_out",
+      "repeat": 2,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.7830899469990982,
+      "model_calls": 9,
+      "repair_cycles": 0,
+      "execution_model_calls": 6,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 6
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "d14bbc4d3f888fa5d0937b4b92c8f2479c1e6d616a4821b4e2ab80e37ed08227",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/read-only-diagnosis-2-2/state/runs/3a5a9e1ae82749148d58dcca22bcb4af/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "preserve-total",
+      "split": "held_out",
+      "repeat": 0,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.02903217599669,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "25b25db095127e75ad377508839f825c57c2ead8f8adb34ad67435f6beddf687",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/preserve-total-2-0/state/runs/8e2587bf340547abb63313a59ebf33c8/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "new-total",
+      "split": "development",
+      "repeat": 1,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.844341441988945,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "ab7c55944879f6a896db2a35d8ab3f4ecc6d5a12f5c400fc7c4dd757569a0e57",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/new-total-2-1/state/runs/ea23d4022041409592faf26779bf8522/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "cli-surface",
+      "split": "held_out",
+      "repeat": 0,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.5542002959991805,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "23c7ea7174396cb06d7498ec17f8f29e85bd78bf52baa1c20b014325d6368a8b",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/cli-surface-2-0/state/runs/9e5a024682484dbfbf34fde0ed6bf182/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "coupled-policy",
+      "split": "held_out",
+      "repeat": 2,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.6198589890118456,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "ea1c65f2f0ef97cf54441002f85839354605eb4f8dcbba86473dedf6c6531bff",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/coupled-policy-2-2/state/runs/bf550604acda4449925c4e681d413ace/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "independent-caps",
+      "split": "development",
+      "repeat": 1,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.1956907689891523,
+      "model_calls": 16,
+      "repair_cycles": 0,
+      "execution_model_calls": 13,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 13
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "5c35d66b6eff00e174e223e1d981b5c35696db19a3ee423bc0160f12da425207",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/independent-caps-2-1/state/runs/640f5c6059924c90ae0ecac6fcc41645/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "independent-caps",
+      "split": "development",
+      "repeat": 0,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.19463040100527,
+      "model_calls": 16,
+      "repair_cycles": 0,
+      "execution_model_calls": 13,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 13
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "88c07d319849bdf4db44be4b67ecfab78c10dee47d9b49c8608f8fd152c6aa62",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/independent-caps-2-0/state/runs/e4b572cf1100457fa51a506a4227757c/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "cli-surface",
+      "split": "held_out",
+      "repeat": 1,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.5578643559856573,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "f30a79344c49f7181b0d2ca2e16d3d65a06f5b8b2a2a66f9a70a196019de77fa",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/cli-surface-2-1/state/runs/1b88526ba3104e71af818d191afa3d5e/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "preserve-total",
+      "split": "held_out",
+      "repeat": 2,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.2011447340046288,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "73eaaa8366d3a1004dafa13e05f99e783d69db545cd4078bd81413a7fd7b7684",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/preserve-total-2-2/state/runs/e8f3b2e8600f4beab042cffb671954fb/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "new-total",
+      "split": "development",
+      "repeat": 2,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.8493723279971164,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "64bce76d878df45c7b14f349d06fce4d8a637b37c6fbe39adedda1aa2c5d082b",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/new-total-1-2/state/runs/e6f61c68359846be964baa2c8872ed06/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "coupled-policy",
+      "split": "held_out",
+      "repeat": 1,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.5098887950007338,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "537dee97ffb02fe3633cce43aa905bad42d060ae94ca3d031b2fb1c448fee68d",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/coupled-policy-2-1/state/runs/44ac5d9dc50d4a1ca31f6b35ef1beff7/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "retry-cap",
+      "split": "development",
+      "repeat": 0,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.0897576330025913,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "fb776c66d2ad8aa2526e4b8c760f78aff95c93bfa03ddce527f33c6f05974054",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/retry-cap-2-0/state/runs/08133b6a910e40da96bdc802b5b5b86a/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "cli-surface",
+      "split": "held_out",
+      "repeat": 2,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.566805051988922,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "f9a2dabc93638229e54bcd17bbe8e1e7db1a6b582db03b875088c6d483cd93e4",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/cli-surface-2-2/state/runs/aa52cc324e8643e89e2aeb8689d171c5/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "independent-caps",
+      "split": "development",
+      "repeat": 2,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.3234954549989197,
+      "model_calls": 16,
+      "repair_cycles": 0,
+      "execution_model_calls": 13,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 13
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "daecd04ff8e37af65fa9ed6adde85355a520f622db8e4bbbcc31827c377f36e1",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/independent-caps-2-2/state/runs/34d767907fb946ba950e626eab5eb7eb/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "new-total",
+      "split": "development",
+      "repeat": 0,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.8595050709991483,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "388c1e40261b70e4c1cb83868cb6bc4f28262421ded49648af8d836c5c46c84e",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/new-total-2-0/state/runs/624522ad27544955aa87509e00fa149c/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "retry-cap",
+      "split": "development",
+      "repeat": 1,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.1072634059964912,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "23ead97b71420fa6316058d08593ba0037e8716d6420477c033620db9814da19",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/retry-cap-2-1/state/runs/dedadfeb1f984b5e8bd60c4c4776fdab/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "cli-surface",
+      "split": "held_out",
+      "repeat": 2,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.5779764809994958,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "fd96f38081964ea65c4a63f927e761d3902249c49e5f149030c4095d0979ca29",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/cli-surface-1-2/state/runs/6feed814cfc5429b8e5ef4a2e5ed99be/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "preserve-total",
+      "split": "held_out",
+      "repeat": 1,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.1683019420015626,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "910dc0e43a88b377e031f2c0b89f59cdada063961e666d86d0877a42a6991623",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/preserve-total-1-1/state/runs/35c776da2149423e82e83cbf7db4f00e/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "read-only-diagnosis",
+      "split": "held_out",
+      "repeat": 1,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.815739327998017,
+      "model_calls": 9,
+      "repair_cycles": 0,
+      "execution_model_calls": 6,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 6
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "63dc3b37ff25823fe92ba6e9c501b86cbe10c46f7aeb133e28bf689f0244548b",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/read-only-diagnosis-2-1/state/runs/25d4676eb8384bbbae5cba0093efde49/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "coupled-policy",
+      "split": "held_out",
+      "repeat": 0,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.5352529069932643,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "0c08154a8893065dabdf5ed80aebe6b08943dbdaf33c1b53c749a4e34d2cd280",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/coupled-policy-1-0/state/runs/c61eb87de99f45ac884c1ad363f0a65c/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "read-only-diagnosis",
+      "split": "held_out",
+      "repeat": 1,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 0.7860441490047378,
+      "model_calls": 9,
+      "repair_cycles": 0,
+      "execution_model_calls": 6,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 6
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "e98b0aa76e9a90744caa4ab8696d2f73a9d95da2c9bb6fd039ce640e92d19f95",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/read-only-diagnosis-1-1/state/runs/60e1d1a83c5944b1980e19412275b0f2/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "independent-caps",
+      "split": "development",
+      "repeat": 1,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.6491479499964043,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "3031029a9097eb8e31908c93bb1bec3cec464b5780cec2ab082de366da0d7166",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/independent-caps-1-1/state/runs/7a496fdb63a941be97becaaae5547b39/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "coupled-policy",
+      "split": "held_out",
+      "repeat": 1,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.5261766509938752,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "447ed0079c877e8fc9c9f94469e59c10d409878726b3775f1dd509c2794ee3bf",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/coupled-policy-1-1/state/runs/8a8b8c5337f84a1bbcc990449aac0f25/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "coupled-policy",
+      "split": "held_out",
+      "repeat": 2,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.64646192699729,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "777c609b9506b8dcdd1328776784ec9149b1277f00071d3d7f99d16945a1b97c",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/coupled-policy-1-2/state/runs/466ae71eb5eb4b72b152bc045f3ed9f6/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "preserve-total",
+      "split": "held_out",
+      "repeat": 1,
+      "configuration": "5db0bbf4e8d42c9ebc7af17da64f1428ef1943163462035e627061e196db0d33",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.0450723630056018,
+      "model_calls": 10,
+      "repair_cycles": 0,
+      "execution_model_calls": 7,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 7
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "f3ea9935ebbaff3faa060de7d70d23b87a6f8802076feb0049558fd9aaa46297",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/preserve-total-2-1/state/runs/1ae52c265e5d46b68b815155f3c557ad/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "retry-cap",
+      "split": "development",
+      "repeat": 2,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.1026492079981836,
+      "model_calls": 12,
+      "repair_cycles": 0,
+      "execution_model_calls": 9,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 9
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "bc0518bd4b07d8272901661728013c0d49aee0fd296eb6b60102b23a460e8d6a",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/retry-cap-1-2/state/runs/258de1f315bb427d890afd61db116cac/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "independent-caps",
+      "split": "development",
+      "repeat": 2,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.4876678829896264,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "e26a57dbe677d0e169ea4141b93a7d96fb2f0aa1db5f2bc471d7f6d3859ab9bc",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/independent-caps-1-2/state/runs/10cc3e1b97474d1b92600b6426d571d3/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    },
+    {
+      "case": "independent-caps",
+      "split": "development",
+      "repeat": 0,
+      "configuration": "b5b470fc0bfc5dca9972f9d4c5150b591f2f5605f8ca3ecc8872f6620d931129",
+      "generation": "scripted",
+      "status": "verified",
+      "independently_correct": true,
+      "source_unchanged": true,
+      "scope_violations": [],
+      "seconds": 1.7352661089971662,
+      "model_calls": 18,
+      "repair_cycles": 0,
+      "execution_model_calls": 15,
+      "coordinator_model_calls": 3,
+      "cost": null,
+      "usage": {
+        "execution": {
+          "input_tokens": null,
+          "output_tokens": null,
+          "cost": null,
+          "unreported_calls": 15
+        },
+        "coordinator": {
+          "model_calls": 3,
+          "tokens": null,
+          "cost": null
+        }
+      },
+      "human_interventions": null,
+      "message": "Verified local deliverable; user acceptance and application remain separate",
+      "failure_category": null,
+      "contract_hash": "3c2167d7a18d750f845d01652a43cd0980d4307c8f3dd6e5beb31090fa6d6cbb",
+      "evidence": "/tmp/shinobi-workflow-evaluation-clb4l4et/independent-caps-1-0/state/runs/4cbc9ea96798484f9cc41d661635af13/evidence.json",
+      "environment": "09a641cf1371b43ef816463608ba0db11fcd50eff2a457312162d267257e0865"
+    }
+  ]
+}

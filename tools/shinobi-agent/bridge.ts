@@ -28,6 +28,89 @@ export interface Request {
   contract_hash?: string;
   run_id?: string;
   execution?: ExecutionSettings;
+  autonomy?: 'standard' | 'within_contract';
+}
+
+export interface Measurement {
+  key: string;
+  operator: 'le' | 'ge' | 'eq';
+  threshold: number;
+  unit: string;
+}
+
+export interface EngineeringPlan {
+  acceptance: {
+    criterion: number;
+    check_ids: string[];
+    surface: string;
+    expected_observation: string;
+    limitations: string[];
+  }[];
+  quality_constraints: {
+    id: string;
+    requirement: string;
+    check_ids: string[];
+  }[];
+}
+
+export interface RequirementRecord {
+  revision: number;
+  requirements: {
+    id: string;
+    statement: string;
+    kind?: 'behavior' | 'invariant' | 'exclusion';
+    origin: 'user' | 'inference';
+    source_turn: string;
+    source_quote: string;
+  }[];
+  glossary?: Record<string, string>;
+  decisions?: {
+    id: string;
+    choice: string;
+    rationale: string;
+    requirement_ids: string[];
+    depends_on?: string[];
+    status?: 'proposed' | 'unresolved';
+  }[];
+  uncertainties?: string[];
+  supersedes?: Record<string, string>;
+}
+export interface LifecyclePlan {
+  requirements: RequirementRecord;
+  scenarios: {
+    id: string;
+    requirement_ids: string[];
+    criterion: number;
+    given: string;
+    action: string;
+    expected: string;
+    side_effects?: string[];
+    surface: string;
+    check_ids: string[];
+  }[];
+  assignments: {
+    item_id: string;
+    requirement_ids: string[];
+    scenario_ids: string[];
+  }[];
+  test_admissions?: {
+    item_id: string;
+    paths: string[];
+    scenario_ids: string[];
+    check_ids: string[];
+  }[];
+  selection_reason: string;
+}
+export interface StageReview {
+  stage: string;
+  verdict: 'pass' | 'changes_required' | 'needs_amendment';
+  summary: string;
+  findings: {
+    category: string;
+    requirement_ids: string[];
+    explanation: string;
+  }[];
+  artifact_hash?: string;
 }
 
 export interface ExecutionSettings {
@@ -40,6 +123,7 @@ export interface ExecutionSettings {
     protected_paths?: string[];
     expected_exit_code?: number;
     baseline_requirement?: 'observe' | 'pass';
+    measurements?: Measurement[];
   }[];
   work_items: {
     id: string;
@@ -61,6 +145,10 @@ export interface ExecutionSettings {
   task_type?: 'investigation' | 'bug_fix' | 'feature' | 'refactor';
   role_models?: Record<string, string>;
   guidance_ids?: string[];
+  engineering?: EngineeringPlan | null;
+  lifecycle?: LifecyclePlan | null;
+  adversarial_models?: string[];
+  autonomy?: 'standard' | 'within_contract';
 }
 
 export interface Contract {
@@ -87,10 +175,13 @@ export interface Contract {
       guidance: Record<string, unknown>[];
     };
     protected_inputs?: Record<string, [string, boolean]>;
+    planning_review?: StageReview;
+    user_instructions?: Record<string, string>;
   };
 }
 
 export interface Run {
+  stage_reviews?: StageReview[];
   id: string;
   status: string;
   contract_hash: string;
@@ -116,6 +207,10 @@ export interface Run {
     artifact_hash: string;
     outcome?: string;
     expected_exit_code?: number;
+    measurements?: (Measurement & {
+      observed: number | null;
+      outcome: string;
+    })[];
   }[];
   artifact?: {
     workspace: string;
@@ -142,6 +237,10 @@ export interface Proposal {
   affected_paths: string[];
   acceptance_criteria: string[];
   unresolved_questions: string[];
+  engineering?: EngineeringPlan | null;
+  lifecycle?: LifecyclePlan | null;
+  guidance_ids?: string[] | null;
+  guidance_reason?: string;
 }
 export interface Outcome {
   kind: 'answer' | 'needs_input' | 'proposal';
@@ -154,6 +253,7 @@ export interface Outcome {
     claim: string;
   }[];
   proposal: Proposal | null;
+  autonomy_offer?: string | null;
 }
 export interface Session {
   id: string;
@@ -165,6 +265,7 @@ export interface Session {
   turn_count: number;
 }
 export interface Result {
+  planning_review?: StageReview;
   version: 1;
   request_id: string;
   status: 'ok' | 'error';
@@ -242,6 +343,11 @@ function parseResult(stdout: string, request: Request): Result {
       !Array.isArray(c.data.work_items)
     )
       throw new Error('Invalid contract schema.');
+    if (
+      c.data.autonomy !== undefined &&
+      !['standard', 'within_contract'].includes(c.data.autonomy)
+    )
+      throw new Error('Invalid contract autonomy selection.');
     if (c.data.schema_version !== undefined && c.data.schema_version !== 2)
       throw new Error('Unsupported execution contract schema version.');
     if (
@@ -258,6 +364,23 @@ function parseResult(stdout: string, request: Request): Result {
         'Missing bound environment, workflow or protected check inputs.',
       );
   }
+  if (
+    result.planning_review &&
+    (!['changes_required', 'needs_amendment'].includes(
+      result.planning_review.verdict,
+    ) ||
+      typeof result.planning_review.summary !== 'string' ||
+      !Array.isArray(result.planning_review.findings) ||
+      !result.planning_review.findings.every(
+        (f) =>
+          f &&
+          typeof f.category === 'string' &&
+          typeof f.explanation === 'string' &&
+          Array.isArray(f.requirement_ids) &&
+          f.requirement_ids.every((id) => typeof id === 'string'),
+      ))
+  )
+    throw new Error('Invalid planning review.');
   if (result.run) {
     const r = result.run;
     if (
@@ -281,7 +404,11 @@ function parseResult(stdout: string, request: Request): Result {
     )
       throw new Error('Invalid run schema.');
   }
-  if (request.operation === 'contract' && !result.contract)
+  if (
+    request.operation === 'contract' &&
+    !result.contract &&
+    !result.planning_review
+  )
     throw new Error('Missing executable contract.');
   if (
     ['approve', 'pause', 'cancel', 'continue', 'steer', 'recover'].includes(
@@ -307,6 +434,8 @@ function parseResult(stdout: string, request: Request): Result {
       !Array.isArray(o.evidence)
     )
       throw new Error('Invalid outcome schema.');
+    if (o.autonomy_offer != null && typeof o.autonomy_offer !== 'string')
+      throw new Error('Invalid autonomy offer.');
     for (const e of o.evidence)
       if (
         !e ||

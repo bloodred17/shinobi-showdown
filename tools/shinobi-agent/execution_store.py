@@ -78,6 +78,8 @@ class Runs:
             raise BoundaryFailure("evidence", "Contract content changed; new approval required", amendment=True)
         if raw.get("schema_version") != 2 or raw.get("policy_version") != POLICY_VERSION:
             raise BoundaryFailure("compatibility", "Legacy or unknown execution contract; records preserved, review a new contract", amendment=True)
+        if not raw.get("lifecycle") or not raw.get("planning_review") or not raw.get("user_instructions"):
+            raise BoundaryFailure("compatibility", "Contract predates required lifecycle planning; records preserved, review a new contract", amendment=True)
         contract = TaskContract.model_validate(raw)
         if digest(contract.model_dump()) != identity:
             raise BoundaryFailure("compatibility", "Contract is not the full canonical schema; review a new contract", amendment=True)

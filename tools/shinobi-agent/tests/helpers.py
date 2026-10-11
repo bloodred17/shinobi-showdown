@@ -32,6 +32,10 @@ def structured(value):
 
 def scripted_generate(self, messages, **kwargs):
     """Test-only model replacement. All graph, tools, checkpoints and transport remain real."""
+    from lifecycle_helpers import stage_generate
+    stage = stage_generate(messages)
+    if stage is not None:
+        return stage
     users = [m.content for m in messages if isinstance(m, HumanMessage)]
     current = users[-1]
     wants_proposal = "proposal" in current.lower() and "without a new proposal" not in current.lower()

@@ -29,12 +29,16 @@ from helpers import output
 from runner import dispatch
 from sandbox import Sandbox
 from store import Store
-from workflows import GUIDANCE, PLAYBOOKS
+from workflows import GUIDANCE, PLAYBOOKS, SKILLS, skill_record
 from workspace import artifact_hash, changes, contains, local_git, manifest
 
 
 def generation(case):
     def generate(self, messages, **kwargs):
+        from lifecycle_helpers import stage_generate
+        stage = stage_generate(messages)
+        if stage is not None:
+            return stage
         prompt = "\n".join(str(message.content) for message in messages if message.type == "system")
         calls = {message.tool_call_id for message in messages if isinstance(message, ToolMessage)}
         def emit(name, arguments, identity):
@@ -117,7 +121,13 @@ Return one grounded proposal for this requested process, with no writes during t
             conversation = request("chat", query=query)
             if conversation["outcome"]["kind"] != "proposal":
                 raise ValueError("Proposal was not ready; clarification remains part of the recorded outcome")
-            contract = request("contract", execution=settings)["contract"]
+            if not live:
+                from lifecycle_helpers import plan_for
+                settings["lifecycle"] = plan_for(conversation["outcome"]["proposal"], settings, "chat", query)
+            planned = request("contract", execution=settings)
+            contract = planned["contract"]
+            if contract is None:
+                raise ValueError("Planning review requires revision: " + json.dumps(planned["planning_review"]))
             run_id = request("approve", contract_hash=contract["hash"])["run"]["id"]
             execute_run(store.root, run_id)
         info = Runs(store).info(run_id)
@@ -136,8 +146,10 @@ Return one grounded proposal for this requested process, with no writes during t
                     "validation" if isinstance(exc, (ValidationError, ValueError)) else "environment" if isinstance(exc, OSError) else "evaluation")
         info = {**info, "message": sanitize(str(exc)), "failure_category": info.get("failure_category") or getattr(exc, "category", category)}
     finally:
+        planning_calls = sum(len(json.loads(row['data']).get('model_calls', []))
+                             for row in store.db.execute('SELECT data FROM planning_reviews'))
         store.close()
-    coordinator_calls = sum(len(evidence.models) for evidence in coordinator_evidence)
+    coordinator_calls = sum(len(evidence.models) for evidence in coordinator_evidence) + planning_calls
     return {"case": case["id"], "split": case["split"], "repeat": repeat, "configuration": config["id"],
             "generation": "live" if live else "scripted", "status": info["status"], "independently_correct": correct,
             "source_unchanged": before == manifest(repository), "scope_violations": violations,
@@ -175,9 +187,9 @@ def main():
         model = configuration()
         for count in workers:
             config = {"workers": count, "role_models": args.role_models, "model": model,
-                      "policy": POLICY_VERSION, "workflow_hash": digest(PLAYBOOKS), "guidance_hash": digest(GUIDANCE),
+                      "policy": POLICY_VERSION, "workflow_hash": digest(PLAYBOOKS), "guidance_hash": digest({**GUIDANCE, **{key: skill_record(key) for key in SKILLS}}),
                       "runtime_files": {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
-                                        for name in ("agent.py", "runner.py", "execution.py", "execution_api.py", "execution_contracts.py", "profiles.py", "verification.py", "workflows.py")},
+                                        for name in ("agent.py", "runner.py", "execution.py", "execution_api.py", "execution_contracts.py", "engineering.py", "lifecycle.py", "lifecycle_execution.py", "profiles.py", "verification.py", "workflows.py")},
                       "harness_hash": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), "selected_cases": selected_ids}
             identity = digest(config)
             configs[identity] = {**config, "id": identity}

@@ -6,7 +6,8 @@ import sys
 
 from agent import configuration, sanitize
 from contracts import Proposal
-from execution_contracts import ExecutionSettings, TaskContract
+from execution_contracts import ExecutionSettings, TaskContract, digest, BoundaryFailure
+from lifecycle import validate_lifecycle, validate_sources, review_stage
 from execution_store import Runs, TERMINAL
 from repository import git
 from workspace import artifact_hash
@@ -46,11 +47,13 @@ def summary(runs, run_id):
                  usage=info.get("usage", {"input_tokens": None, "output_tokens": None, "cost": None}))
     value["events"] = [{"seq": e["seq"], "kind": e["kind"], "created_at": e["created_at"]} for e in info["events"]]
     value["checks"] = [{k: c[k] for k in ("id", "exit_code", "artifact_hash", "argv", "cwd")}
-                       | {k: c.get(k) for k in ("outcome", "failure_category", "expected_exit_code", "test_count")}
+                       | {k: c.get(k) for k in ("outcome", "failure_category", "expected_exit_code", "test_count", "measurements")}
                        for c in info["checks"]]
     value["baseline_checks"] = [{k: c.get(k) for k in ("id", "exit_code", "outcome", "failure_category", "artifact_hash", "test_count")}
                                 for c in info.get("baseline_checks", [])]
     value["reviews"] = [{"verdict": r["verdict"], "summary": r["summary"], "artifact_hash": r["artifact_hash"]} for r in info["reviews"][-3:]]
+    value["stage_reviews"] = [{k: r[k] for k in ("stage", "verdict", "summary", "artifact_hash", "findings")}
+                              for r in info.get("stage_reviews", [])[-4:]]
     if info.get("artifact") and info["artifact"].get("disposition") == "diagnostic":
         reports = {}
         for attempt in info["attempts"].values():
@@ -90,12 +93,33 @@ def dispatch_execution(request, store):
             if not proposal_turn:
                 raise ValueError("Ask for a repository-grounded proposal before creating an executable contract")
             proposal = Proposal.model_validate(proposal_turn["response"]["outcome"]["proposal"])
-            settings = ExecutionSettings.model_validate(request.execution or {
+            latest = runs.latest(request.session_id)
+            defaults = {
                 "checks": proposal.checks,
                 "work_items": proposal.work_items or [{"id": "implement", "instruction": "\n".join(proposal.approach), "paths": proposal.affected_paths}],
-            })
-            latest = runs.latest(request.session_id)
+                "engineering": proposal.engineering.model_dump() if proposal.engineering else None,
+                "lifecycle": proposal.lifecycle.model_dump() if proposal.lifecycle else None,
+                "guidance_ids": proposal.guidance_ids,
+                "mode": "diagnostic" if proposal.task_type == "investigation" else "implement",
+            }
+            if request.autonomy is not None and latest:
+                if latest["data"]["proposal_version"] != row["proposal_version"]:
+                    raise ValueError("Proposal changed; draft its new contract before selecting autonomy")
+                # Preserve all reviewed settings when the user changes only the autonomy preference.
+                defaults = {key: value for key, value in latest["data"].items() if key in ExecutionSettings.model_fields}
+            settings = ExecutionSettings.model_validate({**defaults, **(request.execution or {})})
+            if request.autonomy is not None:
+                settings.autonomy = request.autonomy
+            validate_lifecycle(proposal, settings)
+            user_instructions = {r["request_id"]: r["query"] for r in store.db.execute(
+                "SELECT request_id,query FROM turns WHERE session_id=? AND status='completed' ORDER BY rowid", (request.session_id,))}
+            user_instructions.update({"steer-" + str(r["seq"]): r["instruction"] for r in store.db.execute(
+                "SELECT seq,instruction FROM session_directions WHERE session_id=? ORDER BY seq", (request.session_id,))})
+            validate_sources(settings.lifecycle, user_instructions)
             metadata = store.info(request.session_id)
+            for admission in settings.lifecycle.test_admissions:
+                if any((store.workspace(request.session_id) / path).exists() for path in admission.paths):
+                    raise ValueError("Test admission requires new paths absent from the committed baseline")
             model = configuration()
             workflow = select_workflow(proposal, settings, model)
             settings.task_type, settings.role_models = workflow.task_type, workflow.models
@@ -108,11 +132,39 @@ def dispatch_execution(request, store):
             # Keep the historical proposal turn intact, but the reviewed executable
             # contract must not carry conflicting draft check/assignment identities.
             proposal = proposal.model_copy(update={"checks": [check.model_dump() for check in settings.checks],
-                                                   "work_items": [item.model_dump() for item in settings.work_items]})
+                                                   "work_items": [item.model_dump() for item in settings.work_items],
+                                                   "engineering": settings.engineering,
+                                                   "lifecycle": settings.lifecycle,
+                                                   "guidance_ids": settings.guidance_ids})
+            planning_input = {"settings": settings.model_dump(), "proposal": proposal.model_dump(),
+                              "source_revision": metadata["revision"], "user_instructions": user_instructions}
+            if len(json.dumps(planning_input).encode()) > 120 * 1024:
+                raise ValueError("Planning input exceeds the review budget; narrow the task")
+            from langchain_core.tools import tool
+            from repository import safe_path
+            @tool
+            def read_source(path: str) -> str:
+                """Read committed repository source during independent planning review."""
+                source = store.workspace(request.session_id) / safe_path(path)
+                if source.is_symlink() or not source.is_file() or source.stat().st_size > 1024 * 1024:
+                    raise ValueError("Unavailable source file")
+                content = source.read_text()
+                return content[:48000] + ("\n[Truncated: narrow the task or source file before relying on complete coverage.]" if len(content) > 48000 else "")
+            from workflows import skill_tools
+            planning_review = review_stage(workflow.models["reviewer"], "planning",
+                {"contract": {**planning_input, **settings.model_dump()}, "workflow": workflow.model_dump()}, [read_source, *skill_tools(workflow)])
+            planning_review["input_hash"] = digest(planning_input)
+            store.db.execute("INSERT INTO planning_reviews VALUES (?,?,?,?)",
+                             (request.session_id, request.request_id, planning_review["input_hash"], json.dumps(planning_review)))
+            if planning_review["verdict"] != "pass":
+                response = {"contract": None, "planning_review": planning_review}
+                runs.remember(request, response)
+                return response
             contract = TaskContract(**settings.model_dump(), version=latest["data"]["version"] + 1 if latest else 1,
                                     proposal_version=row["proposal_version"], source_revision=metadata["revision"],
                                     model=model, proposal=proposal, environment=environment,
-                                    workflow=workflow, protected_inputs=protection)
+                                    workflow=workflow, protected_inputs=protection,
+                                    planning_review=planning_review, user_instructions=user_instructions)
             if len(json.dumps(contract.model_dump()).encode()) > 192 * 1024:
                 raise ValueError("Effective contract exceeds the review transport limit; narrow its check inputs and scope")
             response = {"contract": runs.draft(request.session_id, contract)}

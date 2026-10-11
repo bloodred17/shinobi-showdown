@@ -55,5 +55,6 @@ class EvaluationTests(unittest.TestCase):
         failed = next(record for record in self.records if record["configuration"] == "parallel")
         failed.update(status="failed", independently_correct=False)
         report = compare(self.corpus, self.records, self.configs)
-        self.assertEqual(report["summaries"]["parallel"]["cost_per_correct_completion"], 18 / 17)
+        attempts = len(self.corpus["cases"]) * 3
+        self.assertEqual(report["summaries"]["parallel"]["cost_per_correct_completion"], attempts / (attempts - 1))
         self.assertFalse(report["decisions"]["parallel"]["eligible_for_review"])

@@ -11,7 +11,7 @@ from execution_helpers import scripted_execution_generate
 
 
 def generate(self, messages, **kwargs):
-    if "--hang" in sys.argv:
+    if "--hang" in sys.argv and any("bounded, user-approved repository work item" in str(m.content) for m in messages):
         time.sleep(300)
     time.sleep(0.15)
     return scripted_execution_generate(self, messages, **kwargs)

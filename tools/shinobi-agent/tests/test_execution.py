@@ -71,6 +71,17 @@ class ExecutionTests(unittest.TestCase):
         self.temp.cleanup()
 
     def request(self, operation, identity=None, **fields):
+        if operation == "contract":
+            from lifecycle_helpers import plan_for
+            rows = self.store.db.execute("SELECT request_id,query,response FROM turns WHERE session_id=? AND status='completed' ORDER BY rowid", (self.session,)).fetchall()
+            row = next((r for r in reversed(rows) if json.loads(r["response"]).get("outcome", {}).get("proposal")), None)
+            if row and fields.get("execution") is not None:
+                settings = dict(fields["execution"])
+                proposal = json.loads(row["response"])["outcome"]["proposal"]
+                settings.setdefault("lifecycle", plan_for(proposal, settings, row["request_id"], row["query"]))
+                fields["execution"] = settings
+            with patch.object(ChatOpenRouter, "_generate", scripted_execution_generate):
+                return dispatch(Request(operation=operation, request_id=identity or operation, session_id=self.session, **fields), self.store)
         return dispatch(Request(operation=operation, request_id=identity or operation, session_id=self.session, **fields), self.store)
 
     def approve(self):
@@ -202,7 +213,7 @@ class ExecutionTests(unittest.TestCase):
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
         try:
             deadline = time.monotonic() + 10
-            while Runs(self.store).info(run_id)["model_calls"] == 0:
+            while not any(a["status"] == "running" for a in Runs(self.store).info(run_id)["attempts"].values()):
                 if time.monotonic() > deadline:
                     self.fail("Detached controller never started a model call")
                 time.sleep(0.05)

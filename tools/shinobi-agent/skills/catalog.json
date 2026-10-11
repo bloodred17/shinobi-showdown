@@ -1,0 +1,266 @@
+{
+  "requirements-discovery": {
+    "roles": ["coordinator"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Coordinate requirements discovery when intent or terminology is unresolved; reuse established answers for a clear task."
+  },
+  "requirements-interview": {
+    "roles": ["coordinator"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Resolve material product choices in dependency order and distinguish user requirements from researched facts and assumptions."
+  },
+  "domain-modeling": {
+    "roles": ["coordinator"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Resolve ambiguous domain terms, identities, relationships and invariants when those distinctions affect the requested behavior."
+  },
+  "codebase-understanding": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Trace an existing behavior from its public entry point through ownership, state changes and observable results before planning or reviewing it."
+  },
+  "technical-research": {
+    "roles": ["coordinator"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Investigate a consequential technical unknown with primary evidence, competing explanations and a recommendation scoped to the user\u2019s constraints."
+  },
+  "specification": {
+    "roles": ["coordinator"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Turn confirmed requirements into one testable specification with explicit scope, constraints and unresolved decisions."
+  },
+  "task-decomposition": {
+    "roles": ["coordinator"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Split an accepted specification into independently verifiable slices with ownership, acceptance and real dependency edges."
+  },
+  "dependency-execution": {
+    "roles": ["coordinator", "implementer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Coordinate multiple approved dependent tasks using a ready frontier, isolated workers and verification of the integrated specification."
+  },
+  "context-management": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Preserve original requirements, decisions and reliable evidence across task boundaries while keeping each worker context focused."
+  },
+  "context-handoff": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Prepare a restartable handoff at interruption or ownership transfer, including actual state, unresolved decisions and next verification."
+  },
+  "source-grounding": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Resolve version-sensitive API or framework choices from installed code and primary documentation instead of remembered examples."
+  },
+  "quality-constraints": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Establish relevant measurable project quality requirements and detect weakening of the checks used to enforce them."
+  },
+  "incremental-implementation": {
+    "roles": ["implementer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Implement one verifiable behavior slice at a time and re-ground the remaining plan when observed results contradict assumptions."
+  },
+  "behavior-tdd": {
+    "roles": ["implementer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Implement one accepted behavior with a sensitive failing check and the smallest change that makes that behavior pass."
+  },
+  "decision-review": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Challenge a consequential plan, interface or implementation decision with independent evidence before dependent work compounds a mistake."
+  },
+  "failure-correction": {
+    "roles": ["implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Classify a failed check or review, investigate its cause and return to the responsible stage instead of blindly patching or weakening tests."
+  },
+  "application-verification": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Design and prove a project-local recipe for driving the real application when no adequate reusable verification procedure exists."
+  },
+  "specification-review": {
+    "roles": ["reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Independently compare a plan or completed artifact with original requirements, keeping specification compliance separate from engineering quality."
+  },
+  "execution-evidence": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Keep autonomous work reviewable by recording consequential decisions, evidence and unresolved outcomes as they occur."
+  },
+  "decision-documentation": {
+    "roles": ["coordinator", "implementer"],
+    "capabilities": ["read"],
+    "category": "primary",
+    "description": "Update affected documentation and preserve consequential design decisions when a change alters supported behavior or future engineering choices."
+  },
+  "verification-maintenance": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "maintenance",
+    "description": "Audit a project verification recipe against current source and live feature behavior when the app or harness has changed."
+  },
+  "workflow-retrospective": {
+    "roles": ["coordinator", "reviewer"],
+    "capabilities": ["read"],
+    "category": "maintenance",
+    "description": "Diagnose recurring workflow friction from actual run evidence and propose targeted environment or procedure improvements."
+  },
+  "structural-correction": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "maintenance",
+    "description": "Prevent an evidenced recurring mechanical error with a narrowly scoped structural change and demonstrate that it catches the original failure."
+  },
+  "skill-improvement": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "maintenance",
+    "description": "Propose or apply an authorized skill revision based on demonstrated usage failures while preserving accepted decisions and counterexamples."
+  },
+  "lesson-encoding": {
+    "roles": ["coordinator", "reviewer"],
+    "capabilities": ["read"],
+    "category": "maintenance",
+    "description": "Decide whether a repeated lesson belongs in executable structure, a focused skill step or contextual documentation."
+  },
+  "skill-authoring": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "maintenance",
+    "description": "Author or revise a focused Shinobi skill with discoverable triggers, useful procedures, local references and observable completion conditions."
+  },
+  "bug-diagnosis": {
+    "roles": ["implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Diagnose stubborn or intermittent failures with a sensitive reproducer, competing hypotheses and discriminating observations."
+  },
+  "quality-review": {
+    "roles": ["reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Review the actual candidate for correctness, security, maintainability, performance and testing without substituting quality for requirements validation."
+  },
+  "adversarial-review": {
+    "roles": ["reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Adjudicate a contested change using independent reviews and concrete evidence when additional perspectives justify their cost."
+  },
+  "initiative-planning": {
+    "roles": ["coordinator"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Structure a large unclear initiative around dependent decisions before committing to implementation tickets."
+  },
+  "impact-analysis": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Trace the behavioral impact of a shared interface or state change beyond direct textual callers."
+  },
+  "interface-design": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Design a changed public or shared interface from consumer behavior, explicit invariants and compatibility obligations."
+  },
+  "security-review": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Assess trust boundaries and abuse cases for changes involving authorization, untrusted input, secrets or tool execution."
+  },
+  "performance-analysis": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Investigate a measured performance problem using comparable baselines, profiling and correctness-preserving experiments."
+  },
+  "migration-planning": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Plan compatibility-preserving changes to shared APIs or persisted data using consumer inventory, staged cutover and recovery."
+  },
+  "browser-verification": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Plan or execute browser-visible verification with real user interactions and evidence when an authorized browser environment exists."
+  },
+  "observability-design": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Make an asynchronous workflow or service diagnosable with purposeful signals tied to state transitions and failure ownership."
+  },
+  "code-simplification": {
+    "roles": ["implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Simplify a verified implementation while preserving behavior, public contracts and independently established checks."
+  },
+  "design-alternatives": {
+    "roles": ["coordinator", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Compare materially different viable designs for a consequential decision using the same requirements and explicit evaluation criteria."
+  },
+  "independent-coverage": {
+    "roles": ["coordinator", "reviewer"],
+    "capabilities": ["read"],
+    "category": "specialist",
+    "description": "Partition a broad review or verification task into independent coverage responsibilities with explicit methods and evidence."
+  },
+  "bounded-autonomy": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "opt-in",
+    "description": "Continue routine decisions and bounded repairs without repeated consent when the user explicitly selected autonomy in the reviewed task contract."
+  },
+  "requirements-to-acceptance": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "compatibility",
+    "description": "Compatibility guide for the existing engineering acceptance-to-check schema; prefer the focused requirements and specification skills."
+  },
+  "project-verification": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "compatibility",
+    "description": "Compatibility guide for executing approved project checks and recording their evidence; reuse an established project verification recipe."
+  },
+  "engineering-constraints": {
+    "roles": ["coordinator", "implementer", "reviewer"],
+    "capabilities": ["read"],
+    "category": "compatibility",
+    "description": "Compatibility guide for the existing numeric quality measurement schema; prefer quality-constraints for selecting the project quality bar."
+  }
+}

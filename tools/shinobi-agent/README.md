@@ -123,6 +123,66 @@ policy compatibility, role, and capabilities. `role_models` can assign
 model. Every selection is included in the contract hash. External skills and Pi
 packages require separate compatibility review and are not automatically imported.
 
+The [Shinobi-owned skill library](SKILLS.md) contains focused requirements,
+planning, implementation, verification, review, specialist and maintenance
+procedures under `skills/`. `skills/catalog.json` registers the local catalogue.
+The coordinator reads applicable skills through `read_engineering_skill` and
+proposes `guidance_ids` with a `guidance_reason`. Selected bodies and resource
+hashes are bound to the exact contract and provided to compatible roles.
+
+These are independently maintained local procedures. Source ancestry and MIT
+notices are attribution only; no upstream checkout, package installation,
+synchronization or source hash equality is needed. Pi's native skill loading and
+external Deep Agents skill discovery remain disabled. The three original
+schema-oriented guides remain available for compatibility.
+
+The compatibility guides require an `engineering` plan, supplied in the proposal or contract
+settings. `engineering.acceptance` must map every zero-based acceptance criterion
+exactly once to known `check_ids`, a `surface`, an `expected_observation`, and
+optional `limitations`. `engineering.quality_constraints` names each requirement
+and its required check IDs. The controller validates the mapping, runs every
+approved check, and rejects reviewer coverage that omits a predeclared check.
+It does not mechanically prove that a natural-language criterion is adequately
+tested; independent review still has to challenge that claim.
+
+For numeric requirements, a check can include:
+
+```json
+{
+  "measurements": [
+    { "key": "delay", "operator": "le", "threshold": 10, "unit": "seconds" }
+  ]
+}
+```
+
+The check's stdout must be a single JSON object such as `{"delay": 10}`;
+diagnostic logs belong on stderr. Operators are `le`, `ge`, and `eq`. Missing,
+ambiguous, boolean, or non-finite values cannot satisfy a measurement. A zero exit
+code does not waive a failed threshold. Baseline and candidate observations are
+recorded with the artifact identity. Thresholds do not implicitly compare against
+the baseline: approve a concrete number and its rationale. New browser, service,
+network, and dependency capabilities are not added by these skills.
+
+Autonomy is an explicit per-contract preference, defaulting to `standard`.
+The coordinator may offer it with a reason, including when the user requests it.
+Use `/shinobi-autonomy on` to draft `autonomy: "within_contract"`, then review
+the full contract and approve its exact hash. `/shinobi-autonomy off` drafts
+`standard`. Selecting either never starts a run, and changing the selection
+requires approval of the replacement hash. Existing settings are preserved when
+the proposal is unchanged. A changed proposal needs a fresh draft first.
+
+Opt-in guidance tells the implementer to make routine reversible decisions and
+complete checks and bounded repairs without repeated consent within the agreed
+behavior and ownership. Standard runs already execute approved work without
+per-edit prompts; the option records discretion explicitly, not extra tools or
+permissions. Material decisions and changes to scope, checks, limits, permissions,
+or product behavior still require amendment. Active runs cannot be toggled in
+place; pause/steer and review a replacement contract. Pause/cancel remain available.
+The option does not persist as a session-wide or future-task authorization.
+
+Old stored contracts missing the new canonical fields remain inspectable but
+must be drafted and approved again; existing approval hashes are never upgraded.
+
 ## Controls and reconnect
 
 | Command                             | Behavior                                                                         |
@@ -132,6 +192,7 @@ packages require separate compatibility review and are not automatically importe
 | `/shinobi-session`                  | Show the current conversation and reconnect to its run.                          |
 | `/shinobi-sessions`                 | List the latest 50 conversations.                                                |
 | `/shinobi-contract [settings JSON]` | Review an executable contract; creates no approval.                              |
+| `/shinobi-autonomy on\|off`         | Draft a per-contract autonomy choice; exact hash approval remains required.      |
 | `/shinobi-approve <hash>`           | Approve the exact latest contract and start detached execution.                  |
 | `/shinobi-status`                   | Inspect durable state, checks, review and local deliverable.                     |
 | `/shinobi-pause`                    | Stop dispatch and settle active operations, then become paused.                  |
@@ -340,3 +401,16 @@ store.py and execution_store.py own durable state; repository.py and workspace.p
 manage source copies; sandbox.py and sandbox_fileop.py enforce execution isolation;
 agent.py builds roles; execution.py runs the controller; execution_api.py adapts
 controls; runner.py, bridge.ts and extension.ts connect Pi.
+
+## Requirements-grounded execution
+
+Read [the lifecycle guide](LIFECYCLE.md) for the twelve stage-specific skill
+packages, required requirement/scenario/task records, independent planning review,
+regression-test admission, correction routing and final requirements validation.
+New executable proposals must include `lifecycle`; older examples without that
+record illustrate individual settings only and cannot authorize a new run.
+`/shinobi-contract` can return planning findings instead of an executable draft.
+Those findings persist and guide the next conversation turn.
+
+An optional `adversarial_models` list selects up to two explicit additional models
+for independent review within the contract budget. It is empty by default.

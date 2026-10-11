@@ -1,5 +1,7 @@
 """Protected check inputs, baseline observations and independently measured outcomes."""
 import hashlib
+import json
+import math
 import re
 from pathlib import Path
 
@@ -60,13 +62,63 @@ def validate_protection(contract, workspace):
         raise BoundaryFailure("evidence", "Protected check inputs changed: " + ", ".join(changed[:20]), amendment=True)
 
 
-def execute_checks(context, contract, workspace, phase):
+def measure_output(check, stdout):
+    """Read a single unambiguous JSON observation, then apply approved numeric budgets."""
+    if not check.measurements:
+        return [], None
+
+    def unique_object(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError("Duplicate measurement key")
+            result[key] = value
+        return result
+
+    def invalid_constant(_value):
+        raise ValueError("Non-finite observation")
+
+    try:
+        observed = json.loads(stdout, object_pairs_hook=unique_object, parse_constant=invalid_constant)
+        if not isinstance(observed, dict):
+            raise ValueError("Expected a JSON object")
+    except (ValueError, RecursionError):
+        observed = {}
+    measurements = []
+    failure = None
+    for rule in check.measurements:
+        value = observed.get(rule.key)
+        if type(value) not in (int, float) or (isinstance(value, float) and not math.isfinite(value)):
+            outcome, value = "missing_or_invalid", None
+            failure = "evidence"
+        else:
+            passed = {"le": value <= rule.threshold, "ge": value >= rule.threshold, "eq": value == rule.threshold}[rule.operator]
+            outcome = "passed" if passed else "failed"
+            if not passed and failure is None:
+                failure = "code"
+        measurements.append({**rule.model_dump(), "observed": value, "outcome": outcome})
+    return measurements, failure
+
+
+def execute_checks(context, contract, workspace, phase, check_ids=None):
     validate_protection(contract, workspace)
     identity = artifact_hash(workspace)
     sandbox = Sandbox(workspace, context.guard)
     results = []
     for check in contract.checks:
+        if check_ids is not None and check.id not in check_ids:
+            continue
         context.guard()
+        deferred = {key for admission in contract.lifecycle.test_admissions for key in admission.check_ids}
+        if phase == "baseline" and check.id in deferred:
+            result = {"id": check.id, "argv": check.argv, "cwd": check.cwd, "exit_code": None,
+                      "stdout": "", "stderr": "New test requires admission before execution", "seconds": 0,
+                      "phase": phase, "artifact_hash": identity, "environment": contract.environment.model_dump(),
+                      "protected_inputs_hash": digest(contract.protected_inputs), "outcome": "deferred",
+                      "failure_category": None, "test_count": None, "measurements": [], "expected_exit_code": check.expected_exit_code}
+            results.append(result)
+            context.event("baseline_check", result)
+            continue
         category, outcome = None, "passed"
         try:
             result = sandbox.execute(check.argv, cwd=check.cwd, timeout=check.timeout_seconds)
@@ -93,9 +145,14 @@ def execute_checks(context, contract, workspace, phase):
             baseline = next((row for row in context.info().get("baseline_checks", []) if row["id"] == check.id), None)
             if phase == "candidate" and category is None and baseline and baseline.get("test_count") and test_count < baseline["test_count"]:
                 category, outcome = "evidence", "reduced_test_count"
+        measurements, measurement_failure = measure_output(check, result["stdout"])
+        if category is None and measurement_failure:
+            category = measurement_failure
+            outcome = "invalid_measurement" if category == "evidence" else "threshold_failed"
+            result["stderr"] += "\nApproved measurement requirement was not met"
         result.update(id=check.id, artifact_hash=identity, phase=phase, environment=contract.environment.model_dump(),
                       protected_inputs_hash=digest(contract.protected_inputs), expected_exit_code=check.expected_exit_code,
-                      outcome=outcome, failure_category=category, test_count=test_count)
+                      outcome=outcome, failure_category=category, test_count=test_count, measurements=measurements)
         results.append(result)
         context.event("baseline_check" if phase == "baseline" else "verification", result)
     validate_protection(contract, workspace)

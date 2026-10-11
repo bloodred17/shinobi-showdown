@@ -74,7 +74,21 @@ def dispatch(request: Request, store: Store):
             with SqliteSaver.from_conn_string(str(store.root / "checkpoints.sqlite")) as saver:
                 saver.serde = JsonPlusSerializer(allowed_msgpack_modules=[
                     ("contracts", "Outcome"), ("contracts", "Proposal"), ("contracts", "Citation"),
+                    ("contracts", "EngineeringPlan"), ("contracts", "AcceptanceCheck"), ("contracts", "QualityConstraint"),
+                    *[("engineering", name) for name in ("LifecyclePlan", "RequirementRecord", "Requirement", "Decision", "Scenario", "Assignment", "TestAdmission")],
                 ])
+                origins = {r["request_id"]: r["query"] for r in store.db.execute(
+                    "SELECT request_id,query FROM turns WHERE session_id=? AND status IN ('completed','running') ORDER BY rowid", (request.session_id,))}
+                origins.update({"steer-" + str(r["seq"]): r["instruction"] for r in store.db.execute(
+                    "SELECT seq,instruction FROM session_directions WHERE session_id=? ORDER BY seq", (request.session_id,))})
+                metadata["user_turns"] = origins
+                previous_review = store.db.execute("SELECT data FROM planning_reviews WHERE session_id=? ORDER BY rowid DESC LIMIT 1", (request.session_id,)).fetchone()
+                metadata["planning_feedback"] = json.loads(previous_review["data"]) if previous_review else None
+                records = [json.loads(r["response"])["outcome"] for r in store.db.execute(
+                    "SELECT response FROM turns WHERE session_id=? AND status='completed' ORDER BY rowid DESC", (request.session_id,))]
+                previous_requirements = next((o.get("requirements") or (o.get("proposal") or {}).get("lifecycle", {}).get("requirements")
+                    for o in records if o.get("requirements") or (o.get("proposal") or {}).get("lifecycle")), None)
+                metadata["requirements_record"] = previous_requirements
                 agent = make_agent(model_id, store.workspace(request.session_id), metadata, reads, saver)
                 prior = {}
                 if row["checkpoint"]:
@@ -98,6 +112,19 @@ def dispatch(request: Request, store: Store):
                         evidence.calls.append({"name": message.name, "status": "error", "blocked_before_execution": True})
                 outcome = Outcome.model_validate(result.get("structured_response"))
                 validate_evidence(outcome, store.workspace(request.session_id), reads)
+                if outcome.proposal and outcome.proposal.lifecycle:
+                    from lifecycle import validate_sources
+                    validate_sources(outcome.proposal.lifecycle, origins)
+                current_requirements = outcome.requirements or (outcome.proposal.lifecycle.requirements if outcome.proposal and outcome.proposal.lifecycle else None)
+                if current_requirements:
+                    from engineering import RequirementRecord
+                    from lifecycle import validate_requirement_update
+                    validate_requirement_update(RequirementRecord.model_validate(previous_requirements) if previous_requirements else None, current_requirements)
+                    for requirement in current_requirements.requirements:
+                        if requirement.source_quote not in origins.get(requirement.source_turn, ""):
+                            raise ValueError("Requirement origin must quote an actual user turn")
+                    if outcome.requirements and outcome.proposal and outcome.proposal.lifecycle and outcome.requirements != outcome.proposal.lifecycle.requirements:
+                        raise ValueError("Conversation and proposal requirement records disagree")
                 checkpoint = agent.get_state(config).config
             response = {"outcome": outcome.model_dump(), "model": model_id,
                         "tool_calls": evidence.calls, "model_calls": evidence.models,

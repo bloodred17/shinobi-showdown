@@ -29,6 +29,11 @@ class Store:
                 response TEXT, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (session_id, request_id)
             );
+            CREATE TABLE IF NOT EXISTS planning_reviews (
+                session_id TEXT NOT NULL, request_id TEXT NOT NULL,
+                input_hash TEXT NOT NULL, data TEXT NOT NULL,
+                PRIMARY KEY(session_id,request_id)
+            );
         """)
 
     def close(self):

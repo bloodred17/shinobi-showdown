@@ -322,7 +322,19 @@ The current local controller survives Pi closure, has explicit recovery, and ret
 
 **Entry:** stable S1–S4 controls and baseline evaluation; replayable contracts/evidence; a supported task corpus. Parallelism must not be used to compensate for missing single-worker correctness.
 
-**Current status:** four versioned playbooks, three original MIT guidance entries, explicit role-model selection, at most two workers, declared input/interface-aware scheduling and transitive repair invalidation are implemented. Attempts bind consumed input manifests. A versioned six-case corpus compares sequential/two-worker configurations with independent judges and predeclared review thresholds. [Current evidence](../../tools/shinobi-agent/LOCAL_S5_EVIDENCE.md) separates scripted repetitions from live acceptance. No default parallel routing change is justified. External skills/Pi packages, selective steering, broad repository quality and repeated live cost/throughput comparisons remain future work.
+**Current status:** four versioned playbooks, three built-in MIT guidance entries,
+15 engineering skill packages (three original bodies plus twelve focused lifecycle
+adapters), explicit role-model selection, at most two workers, declared
+input/interface-aware scheduling and transitive repair invalidation are implemented.
+Attempts bind consumed input manifests. The current seven-case corpus compares
+sequential/two-worker configurations with independent judges and predeclared review
+thresholds. [Scripted lifecycle evidence](../../tools/shinobi-agent/LIFECYCLE_EVIDENCE.md)
+records 42/42 trials; [live evidence](../../tools/shinobi-agent/LIFECYCLE_LIVE_EVIDENCE.md)
+records 0/7 corpus completions and a separate successful Pi integration check.
+Coordinator validation feedback and structured-output handling remain immediate
+reliability gaps. No default parallel routing change is justified. External skill
+loading/Pi packages, selective steering, broad repository quality and repeated live
+cost/throughput comparisons remain future work.
 
 ### S5A — Task-specific playbooks
 
@@ -338,6 +350,36 @@ Executable diagnosis needs its own approved diagnostic capability before a fix p
 Define playbook input/output contracts, mandatory gates, eligible tools, stop conditions, and escalation paths. Do not force every task through every specialist. Investigations may finish at S1; high-risk migrations, destructive data changes, security-sensitive deployment, or unknown repository stacks require a dedicated approved playbook or a supported blocker.
 
 ### S5B — Roles, skills, and Pi packages
+
+The earlier 2026-10-11 approved local increment added three repository-owned skill bodies
+for requirements-to-acceptance mapping, executable project verification and
+engineering constraints. The coordinator reads a bounded catalogue and proposes
+the selection; the contract binds selected contents and an explicit acceptance
+map. The controller rejects missing mappings and omitted predeclared review checks,
+and records/enforces optional numeric observations from approved check output.
+This does not establish broad stack support or improved live-model reliability.
+
+The subsequent lifecycle increment initially added twelve upstream adapters.
+The approved skill-selection revision now replaces those with a Shinobi-owned
+library of 44 local entries: 20 primary, six maintenance, 14 specialist, one
+opt-in autonomy and three compatibility guides. Selected procedures and necessary
+references are maintained locally; retained ancestry and licenses impose no
+runtime source-repository dependency. See the [local skill guide](../../tools/shinobi-agent/SKILLS.md).
+It adds versioned requirement provenance, scenario/task mappings, independent
+planning review, diagnosis, slice checkpoints, test admission, classified
+correction and final requirements validation. See the
+[current catalogue and workflow](../../tools/shinobi-agent/LIFECYCLE.md).
+The proposed bounded coordinator correction loop remains unimplemented; current
+live failures and its proposed scope are preserved in the
+[live report](../../tools/shinobi-agent/LIFECYCLE_LIVE_EVIDENCE.md).
+
+The user also approved on-demand autonomy **after review of the first exact
+contract**. A coordinator offer is advisory. The user's on/off selection drafts
+a replacement contract whose hash must be approved before execution. Within that
+contract, routine decisions and bounded repairs may proceed without repeated
+consent; scope expansion, material unresolved decisions and additional authority
+still require amendment. Existing verification, steering and stop controls apply.
+There is no task-level pre-authorization, session-wide opt-in, or automatic approval.
 
 - Explorer gathers evidence; planner designs changes; implementer changes assigned files; reviewer challenges results. The strategist selects the process. Every delegated call receives explicit model, tools, policy, input identity, budgets, and expected output.
 - A role is responsibility, a skill is guidance, a playbook is process, and policy is authority. Keep these distinct in configuration and logs.
@@ -575,3 +617,26 @@ Historical design inputs were `/tmp/shinobi-product-blueprint-2026-10-10.md`, `/
 External GitHub behavior was checked against official documentation on 2026-10-10 and linked beside the relevant S6 requirements. Recheck it during implementation, particularly token-trigger behavior, environment-plan limitations, and workflow security. Historical skill/package inspirations have not been represented as installed or currently compatible integrations.
 
 When work lands, update the status table, relevant slice's remaining work, decision register, and evidence references together. Record which baseline was validated. Preserve the S0–S6 identifiers, distinguish implemented from validated and broadly evaluated, and keep unresolved limitations visible. This file is the consolidated roadmap; source code and dated evidence determine what actually exists.
+
+### Requirements-grounded lifecycle increment
+
+The local runtime now requires versioned requirement origins, scenarios and work
+assignments, with independent planning review before exact-hash approval. The
+skill-selection revision provides locally maintained procedures and retained
+license/ancestry notices, replacing the former pinned upstream adapters. Execution
+adds diagnosis, slice checkpoints, regression-test admission with immutable hashes,
+classified correction and final requirements validation. See
+[the lifecycle guide](../../tools/shinobi-agent/LIFECYCLE.md) for operational detail.
+
+The [2026-10-11 evidence](../../tools/shinobi-agent/LIFECYCLE_EVIDENCE.md) records
+84 Python and 11 bridge tests, both scripted Pi integration checks, and 42/42
+scripted evaluation trials. After restart, the
+[live evaluation](../../tools/shinobi-agent/LIFECYCLE_LIVE_EVIDENCE.md) completed
+0/7 corpus cases, all rejected before execution; the separate live Pi integration
+check passed. Bounded coordinator validation feedback and structured-response
+handling remain follow-up work, with the proposed scope recorded in that report.
+
+Scripted regression and supported CLI/library evaluation validate controller
+behavior. A historical three-skill versus lifecycle live quality comparison,
+representative application-stack environments, and browser/service harnesses are
+not established by this increment. Existing S6 publication/cloud boundaries remain.
